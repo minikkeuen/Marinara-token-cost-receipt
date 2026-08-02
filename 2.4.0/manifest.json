@@ -1,0 +1,15 @@
+{
+  "kind": "marinara.personal-extension",
+  "version": 1,
+  "config": {
+    "name": "Token Cost Receipt",
+    "version": "2.0.0",
+    "description": "Shows estimated token cost with model presets, Claude cache TTL rates, automatic long-context tiers, and cached USD/KRW conversion in Marinara Engine 2.4.0.",
+    "runtime": "client",
+    "enabled": false,
+    "capabilities": [
+      "full_page_access"
+    ],
+    "jsPath": "extension.js"
+  }
+}
