@@ -61,12 +61,12 @@
   addStyle(`
 .${MESSAGE_BUTTON}[aria-busy="true"]{cursor:wait;opacity:.45}.${MESSAGE_BUTTON} svg{pointer-events:none}
 #${ROOT}[hidden]{display:none} #${ROOT}{position:fixed;z-index:9998;display:flex;flex-direction:column;width:min(360px,calc(100vw - 24px));max-height:min(78vh,640px);color:var(--foreground,#eee);background:var(--card,var(--background,#171717));border:1px solid var(--border,#444);border-radius:12px;box-shadow:0 14px 42px color-mix(in srgb,#050312 55%,transparent);font:12px/1.45 system-ui,sans-serif;overflow:hidden}
-#${ROOT} *{box-sizing:border-box} #${ROOT} .tr-head{display:flex;flex:0 0 auto;align-items:center;gap:6px;padding:9px 10px 9px 12px;border-bottom:1px solid var(--border,#444);font-weight:700} #${ROOT} .tr-head span{margin-right:auto} #${ROOT} button{border:1px solid var(--border,#555);background:var(--secondary,#292929);color:inherit;border-radius:7px;padding:5px 8px;cursor:pointer;font:inherit} #${ROOT} .tr-icon-btn{display:grid;width:28px;height:28px;place-items:center;border-color:transparent;background:transparent;padding:0;font-size:15px} #${ROOT} .tr-icon-btn:hover{border-color:var(--border,#555);background:var(--secondary,#292929)} #${ROOT} .tr-body{min-height:0;flex:1;padding:12px;overflow:auto;overscroll-behavior:contain} #${ROOT} .tr-muted{opacity:.67} #${ROOT} .tr-title{font-size:13px;font-weight:700;word-break:break-all;margin-bottom:8px} #${ROOT} .tr-row{display:flex;justify-content:space-between;gap:12px;padding:3px 0} #${ROOT} .tr-usage{display:grid;grid-template-columns:minmax(0,1fr) 82px auto;align-items:baseline;gap:8px} #${ROOT} .tr-tokens{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap} #${ROOT} .tr-total{border-top:1px solid var(--border,#444);margin-top:7px;padding-top:8px;font-weight:800;font-size:14px} #${ROOT} details{margin-top:10px;border-top:1px solid var(--border,#444);padding-top:8px} #${ROOT} input,#${ROOT} select{width:100%;margin:3px 0 7px;padding:6px;border:1px solid var(--border,#555);border-radius:7px;background:var(--background,#181818);color:inherit} #${ROOT} input[type="checkbox"]{width:16px;height:16px;margin:0;accent-color:var(--primary,#ffb3d9)} #${ROOT} .tr-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 8px} #${ROOT} .tr-preset{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px;margin:8px 0} #${ROOT} .tr-preset select{margin-bottom:0} #${ROOT} .tr-preset button{min-height:31px;white-space:nowrap} #${ROOT} label{display:block;font-size:11px;opacity:.82} #${ROOT} .tr-toggle{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid color-mix(in srgb,var(--border,#444) 60%,transparent)} #${ROOT} .tr-toggle span{display:grid;gap:2px} #${ROOT} .tr-toggle small{color:var(--muted-foreground,#aaa);font-size:10px;line-height:1.35} #${ROOT} .tr-settings-title{margin:0 0 5px;font-size:13px} #${ROOT} .tr-settings-actions{display:flex;gap:7px;margin-top:10px} #${ROOT} .tr-warn{color:#f5b84b;margin-top:8px} #${ROOT} .tr-error{color:var(--destructive,#ff6b9d)} #${ROOT} .tr-tier{margin:7px 0 3px;padding:7px 8px;border:1px solid color-mix(in srgb,#f5b84b 38%,var(--border,#444));border-radius:8px;background:color-mix(in srgb,#f5b84b 8%,var(--background,#171717));color:#f5c66d;font-weight:650}
+#${ROOT} *{box-sizing:border-box} #${ROOT} .tr-head{display:flex;flex:0 0 auto;align-items:center;gap:6px;padding:9px 10px 9px 12px;border-bottom:1px solid var(--border,#444);font-weight:700} #${ROOT} .tr-head span{margin-right:auto} #${ROOT} button{border:1px solid var(--border,#555);background:var(--secondary,#292929);color:inherit;border-radius:7px;padding:5px 8px;cursor:pointer;font:inherit} #${ROOT} .tr-icon-btn{display:grid;width:28px;height:28px;place-items:center;border-color:transparent;background:transparent;padding:0;font-size:15px} #${ROOT} .tr-icon-btn:hover,#${ROOT} .tr-icon-btn[aria-pressed="true"]{border-color:var(--border,#555);background:var(--secondary,#292929)} #${ROOT} .tr-icon-btn:focus-visible{outline:2px solid var(--primary,#ffb3d9);outline-offset:1px} #${ROOT} .tr-body{min-height:0;flex:1;padding:12px;overflow:auto;overscroll-behavior:contain} #${ROOT} .tr-muted{opacity:.67} #${ROOT} .tr-title{font-size:13px;font-weight:700;word-break:break-all;margin-bottom:8px} #${ROOT} .tr-row{display:flex;justify-content:space-between;gap:12px;padding:3px 0} #${ROOT} .tr-usage{display:grid;grid-template-columns:minmax(0,1fr) 82px auto;align-items:baseline;gap:8px} #${ROOT} .tr-tokens{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap} #${ROOT} .tr-total{border-top:1px solid var(--border,#444);margin-top:7px;padding-top:8px;font-weight:800;font-size:14px} #${ROOT} details{margin-top:10px;border-top:1px solid var(--border,#444);padding-top:8px} #${ROOT} input,#${ROOT} select{width:100%;margin:3px 0 7px;padding:6px;border:1px solid var(--border,#555);border-radius:7px;background:var(--background,#181818);color:inherit} #${ROOT} input[type="checkbox"]{width:16px;height:16px;margin:0;accent-color:var(--primary,#ffb3d9)} #${ROOT} .tr-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 8px} #${ROOT} .tr-preset{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px;margin:8px 0} #${ROOT} .tr-preset select{margin-bottom:0} #${ROOT} .tr-preset button{min-height:31px;white-space:nowrap} #${ROOT} label{display:block;font-size:11px;opacity:.82} #${ROOT} .tr-toggle{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid color-mix(in srgb,var(--border,#444) 60%,transparent)} #${ROOT} .tr-toggle span{display:grid;gap:2px} #${ROOT} .tr-toggle small{color:var(--muted-foreground,#aaa);font-size:10px;line-height:1.35} #${ROOT} .tr-settings-title{margin:0 0 5px;font-size:13px} #${ROOT} .tr-settings-actions{display:flex;gap:7px;margin-top:10px} #${ROOT} .tr-help h3{margin:0 0 8px;font-size:13px} #${ROOT} .tr-help h4{margin:12px 0 4px;font-size:12px} #${ROOT} .tr-help ol,#${ROOT} .tr-help ul{margin:4px 0;padding-left:18px} #${ROOT} .tr-help li{margin:5px 0} #${ROOT} .tr-help-note{margin-top:10px;padding:8px;border:1px solid var(--border,#444);border-radius:8px;background:color-mix(in srgb,var(--secondary,#292929) 55%,transparent)} #${ROOT} .tr-warn{color:#f5b84b;margin-top:8px} #${ROOT} .tr-error{color:var(--destructive,#ff6b9d)} #${ROOT} .tr-tier{margin:7px 0 3px;padding:7px 8px;border:1px solid color-mix(in srgb,#f5b84b 38%,var(--border,#444));border-radius:8px;background:color-mix(in srgb,#f5b84b 8%,var(--background,#171717));color:#f5c66d;font-weight:650}
 @media(max-width:520px){#${ROOT}{left:12px!important;right:12px!important;bottom:calc(12px + env(safe-area-inset-bottom))!important;top:auto!important;width:auto;max-height:70vh}}
   `);
   const root = addElement(document.body, 'section', { id:ROOT, hidden:'', role:'dialog', 'aria-label':'메시지 토큰 영수증' });
   if (!root) return;
-  root.innerHTML = `<div class="tr-head"><span>메시지 영수증</span><button type="button" class="tr-icon-btn" data-act="settings" title="조회 방식 설정" aria-label="조회 방식 설정">⚙</button><button type="button" class="tr-icon-btn" data-act="close" title="닫기" aria-label="닫기">×</button></div><div class="tr-body"><div class="tr-muted">메시지의 영수증 아이콘을 눌러 주세요.</div></div>`;
+  root.innerHTML = `<div class="tr-head"><span>메시지 영수증</span><button type="button" class="tr-icon-btn" data-act="help" title="사용법" aria-label="사용법" aria-pressed="false">?</button><button type="button" class="tr-icon-btn" data-act="settings" title="조회 방식 설정" aria-label="조회 방식 설정" aria-pressed="false">⚙</button><button type="button" class="tr-icon-btn" data-act="close" title="닫기" aria-label="닫기">×</button></div><div class="tr-body"><div class="tr-muted">메시지의 영수증 아이콘을 눌러 주세요.</div></div>`;
   const body = root.querySelector('.tr-body');
   const defaults = { currency:'USD', input:0, read:0, write:0, output:0, adjustment:'none', cacheTtl:'5m', profiles:{}, fx:null, sources:{rpScreen:true,rpPeekFallback:false,conversationPeek:true} };
   const FX_TTL = 6 * 60 * 60 * 1000;
@@ -110,7 +110,7 @@
     ]},
   ];
   const PRESETS = PRESET_GROUPS.flatMap(group=>group.items);
-  let cfg = { ...defaults }, lastReceipt = null, anchorButton = null, activeRequest = null, showingSettings = false;
+  let cfg = { ...defaults }, lastReceipt = null, anchorButton = null, activeRequest = null, panelView = 'receipt';
   const num = v => Number.isFinite(Number(v)) ? Number(v) : 0;
   const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const money = v => `${cfg.currency} ${v < .01 ? v.toFixed(6) : v.toFixed(4)}`;
@@ -130,7 +130,7 @@
       cfg.fx={...(cfg.fx||{}),rate:num(cfg.fx?.rate),source:'Frankfurter',error:String(e?.message||e),lastAttemptAt:Date.now()};
     }
     await storage.patch({config:cfg}).catch(()=>{});
-    if(showingSettings) renderSettings();
+    if(panelView==='settings') renderSettings();
     else if(lastReceipt) render(lastReceipt.message,lastReceipt.usage,lastReceipt.source);
   }
   function activeSidebarChatId(){
@@ -233,7 +233,21 @@
     await storage.patch({config:cfg});
     if(lastReceipt) render(lastReceipt.message,lastReceipt.usage,lastReceipt.source);
   }
+  function setPanelView(view){
+    panelView=view;
+    root.querySelector('[data-act=help]').setAttribute('aria-pressed',String(view==='help'));
+    root.querySelector('[data-act=settings]').setAttribute('aria-pressed',String(view==='settings'));
+  }
+  function renderReceiptOrIdle(){
+    if(lastReceipt) render(lastReceipt.message,lastReceipt.usage,lastReceipt.source);
+    else{
+      setPanelView('receipt');
+      body.innerHTML='<div class="tr-muted">메시지의 영수증 아이콘을 눌러 주세요.</div>';
+      requestAnimationFrame(placePanel);
+    }
+  }
   function render(m,g,source){
+    setPanelView('receipt');
     const p=profileFor(g), c=compute(g,p), configured=[p.input,p.read,p.write,p.output].some(x=>num(x)>0);
     const suggested=currentPreset(g);
     const presetOptions=PRESET_GROUPS.map(group=>`<optgroup label="${esc(group.label)}">${group.items.map(item=>`<option value="${esc(item.id)}" ${suggested?.id===item.id?'selected':''}>${esc(item.label)}${suggested?.id===item.id?' (현재 모델)':''}</option>`).join('')}</optgroup>`).join('');
@@ -278,8 +292,13 @@
     body.querySelector('[data-act=fx]')?.addEventListener('click',async()=>{ body.querySelector('[data-act=fx]').textContent='갱신 중…'; await updateFx(true); });
     body.querySelector('details')?.addEventListener('toggle',()=>requestAnimationFrame(placePanel));
   }
+  function renderHelp(){
+    setPanelView('help');
+    body.innerHTML=`<div class="tr-help"><h3>간단 설정</h3><ol><li>모델 가격표에서 <b>100만 토큰당 가격 (1M)</b>을 입력합니다.</li><li>가격표에 없는 항목은 <b>0</b>으로 둡니다.</li><li>아래에서 차감 방식을 고르고 저장합니다.</li></ol><h4>메시지별 영수증</h4><ul><li>AI 메시지 아래의 영수증 아이콘을 누르면 해당 메시지 한 건의 예상 비용을 확인합니다.</li><li><b>RP 화면 정보:</b> 화면 표시값 사용 (데이터 사용 없음)</li><li><b>Peek Prompt:</b> 메시지의 전체 프롬프트 1회 조회 (데이터 사용)</li><li>조회 방식은 톱니바퀴 버튼에서 선택합니다.</li></ul><h4>뭘 고르나요?</h4><ul><li><b>캐시 읽기가 0:</b> 그대로 과금</li><li><b>Claude 공식 API:</b> 그대로 과금</li><li><b>OpenAI·DeepSeek 공식 API:</b> cache read 차감</li><li><b>Gemini·GLM·OpenRouter:</b> 우선 그대로 과금</li></ul><div class="tr-help-note">OpenRouter는 <b>OpenRouter 가격표</b>를 사용하세요.</div><div class="tr-muted" style="margin-top:10px">표시 금액은 입력한 토큰 단가를 기준으로 계산한 예상액입니다.</div></div>`;
+    requestAnimationFrame(placePanel);
+  }
   function renderSettings(){
-    showingSettings=true;
+    setPanelView('settings');
     const sources={...defaults.sources,...(cfg.sources||{})};
     body.innerHTML=`<h3 class="tr-settings-title">조회 방식</h3>
       <label class="tr-toggle"><input type="checkbox" name="rpScreen" ${sources.rpScreen?'checked':''}><span><b>RP 화면 정보</b><small>화면 표시값 사용 (데이터 사용 없음)</small></span></label>
@@ -309,10 +328,11 @@
   }
   function closePanel(){
     activeRequest?.abort(); activeRequest=null;
-    root.hidden=true; showingSettings=false; lastReceipt=null; anchorButton=null;
+    root.hidden=true; setPanelView('receipt'); lastReceipt=null; anchorButton=null;
     for(const button of document.querySelectorAll(`.${MESSAGE_BUTTON}[aria-expanded="true"]`)) button.setAttribute('aria-expanded','false');
   }
   function showError(message,detail=''){
+    setPanelView('receipt');
     body.innerHTML=`<div class="tr-error"><b>${esc(message)}</b></div>${detail?`<div class="tr-muted" style="margin-top:7px">${esc(detail)}</div>`:''}`;
     requestAnimationFrame(placePanel);
   }
@@ -336,7 +356,7 @@
     activeRequest?.abort(); activeRequest=null;
     for(const other of document.querySelectorAll(`.${MESSAGE_BUTTON}[aria-expanded="true"]`)) other.setAttribute('aria-expanded','false');
     anchorButton=button; button.setAttribute('aria-expanded','true');
-    root.hidden=false; showingSettings=false; lastReceipt=null;
+    root.hidden=false; setPanelView('receipt'); lastReceipt=null;
     body.innerHTML='<div class="tr-muted">토큰 사용량을 읽는 중…</div>';
     requestAnimationFrame(placePanel);
     const messageId=messageElement.getAttribute('data-message-id');
@@ -398,8 +418,12 @@
   observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['aria-hidden']});
   marinara.onCleanup(()=>{observer.disconnect();activeRequest?.abort();document.querySelectorAll(`.${MESSAGE_BUTTON}`).forEach(button=>button.remove())});
   on(root.querySelector('[data-act=close]'),'click',closePanel);
+  on(root.querySelector('[data-act=help]'),'click',()=>{
+    if(panelView==='help') renderReceiptOrIdle();
+    else renderHelp();
+  });
   on(root.querySelector('[data-act=settings]'),'click',()=>{
-    if(showingSettings&&lastReceipt){showingSettings=false;render(lastReceipt.message,lastReceipt.usage,lastReceipt.source);requestAnimationFrame(placePanel)}
+    if(panelView==='settings') renderReceiptOrIdle();
     else renderSettings();
   });
   on(document,'keydown',event=>{if(!root.hidden&&event.key==='Escape')closePanel()});
