@@ -7,6 +7,8 @@
 
   const storage = marinara.storage;
   const setInterval = marinara.setInterval.bind(marinara);
+  const setTimeout = marinara.setTimeout.bind(marinara);
+  const clearTimeout = marinara.clearTimeout.bind(marinara);
   const addStyle = css => {
     const style = document.createElement('style');
     style.dataset.tokenCostReceipt = marinara.extension.id;
@@ -111,8 +113,8 @@
     ]},
   ];
   const PRESETS = PRESET_GROUPS.flatMap(group=>group.items);
-  let cfg = { ...defaults }, chatId = null, lastSignature = '';
-  let refreshBusy = false, listedChatIds = [], listedAt = 0;
+  let cfg = { ...defaults }, chatId = null, lastSignature = '', lastReceipt = null;
+  let refreshBusy = false, refreshQueued = false, queuedChatId = null, domRefreshTimer = null;
   const isVisible = el => {
     if (!(el instanceof Element) || !el.isConnected) return false;
     const style=getComputedStyle(el), r=el.getBoundingClientRect();
@@ -139,45 +141,25 @@
     }
     await storage.patch({config:cfg}).catch(()=>{});
     lastSignature='';
-    await refresh(true);
+    if(lastReceipt) render(lastReceipt.message,lastReceipt.usage);
   }
-  async function chatCandidates(){
-    const ids=[];
+  function activeSidebarChatId(){
+    for(const row of document.querySelectorAll('[data-chat-id]')){
+      const active=[...row.children].some(child=>child.classList?.contains('mari-chrome-accent-progress'));
+      if(active) return row.getAttribute('data-chat-id');
+    }
+    return null;
+  }
+  function latestRequestedChatId(){
     for(const entry of performance.getEntriesByType('resource').slice().reverse()){
       const m=entry.name.match(/\/api\/chats\/([^/?]+)\/messages(?:[/?]|$)/);
-      if(m){ const id=decodeURIComponent(m[1]); if(!ids.includes(id)) ids.push(id); }
+      if(m) return decodeURIComponent(m[1]);
     }
-    if(chatId&&!ids.includes(chatId)) ids.push(chatId);
-    if(Date.now()-listedAt>15000||!listedChatIds.length){
-      try{
-        const chats=await apiFetch('/chats');
-        const arr=Array.isArray(chats)?chats:(chats?.items||chats?.chats||[]);
-        listedChatIds=[...arr].sort((a,b)=>new Date(b.updatedAt||b.createdAt||0)-new Date(a.updatedAt||a.createdAt||0)).map(c=>String(c.id||'')).filter(Boolean).slice(0,20);
-        listedAt=Date.now();
-      }catch{}
-    }
-    for(const id of listedChatIds) if(!ids.includes(id)) ids.push(id);
-    return ids;
+    return null;
   }
-  function visibleMessageIds(){
-    if(professorWindowVisible()) return new Set();
-    return new Set([...document.querySelectorAll('[data-message-id]')].filter(isVisible).map(el=>el.getAttribute('data-message-id')).filter(Boolean));
-  }
-  async function resolveChat(){
+  function currentChatId(preferred=null){
     if(professorWindowVisible()) return null;
-    const visible=visibleMessageIds();
-    if(!visible.size) return null;
-    let best=null;
-    for(const id of (await chatCandidates()).slice(0,30)){
-      try{
-        const data=await apiFetch(`/chats/${encodeURIComponent(id)}/messages?limit=100`);
-        const arr=Array.isArray(data)?data:(data?.items||data?.messages||[]);
-        const ids=new Set(arr.map(m=>String(m.id)));
-        const score=[...visible].reduce((n,messageId)=>n+(ids.has(String(messageId))?1:0),0);
-        if(score&&(!best||score>best.score)) best={id,arr,score};
-      }catch{}
-    }
-    return best&&{id:best.id,arr:best.arr};
+    return preferred||activeSidebarChatId()||chatId||latestRequestedChatId();
   }
   function usageOf(m){ const e=typeof m.extra==='string'?(()=>{try{return JSON.parse(m.extra)}catch{return {}}})():m.extra||{}; return e.generationInfo||null; }
   function profileFor(g){ const key=`${g.provider||''}::${g.model||''}`; return { key, ...(cfg.profiles[key]||cfg) }; }
@@ -225,7 +207,9 @@
     const key=`${g.provider||''}::${g.model||''}`; const q=n=>num(root.querySelector(`[name=${n}]`).value);
     cfg.currency=root.querySelector('[name=currency]').value.trim()||'USD';
     cfg.profiles={...(cfg.profiles||{}),[key]:{input:q('input'),read:q('read'),write:q('write'),output:q('output'),adjustment:root.querySelector('[name=adjustment]').value,cacheTtl:root.querySelector('[name=cacheTtl]').value}};
-    await storage.patch({config:cfg}); await refresh(true);
+    await storage.patch({config:cfg});
+    lastSignature='';
+    if(lastReceipt) render(lastReceipt.message,lastReceipt.usage);
   }
   function render(m,g){
     const p=profileFor(g), c=compute(g,p), configured=[p.input,p.read,p.write,p.output].some(x=>num(x)>0);
@@ -271,24 +255,45 @@
     body.querySelector('[data-act=save]').addEventListener('click',()=>saveProfile(g));
     body.querySelector('[data-act=fx]')?.addEventListener('click',async()=>{ body.querySelector('[data-act=fx]').textContent='갱신 중…'; await updateFx(true); });
   }
-  async function refresh(force=false){
-    if(refreshBusy) return;
+  async function refresh(force=false, preferredChatId=null){
+    const targetChatId=currentChatId(preferredChatId);
+    if(refreshBusy){
+      refreshQueued=true;
+      queuedChatId=targetChatId||queuedChatId;
+      return;
+    }
     refreshBusy=true;
     try{
-      const resolved=await resolveChat();
-      if(!resolved){
+      if(!targetChatId){
         chatId=null; lastSignature='';
         body.innerHTML=professorWindowVisible()?'<div class="tr-muted">교수님 홈 대화는 토큰 usage가 저장되지 않아 계산할 수 없습니다.</div>':'<div class="tr-muted">현재 보이는 채팅을 확인하는 중…</div>';
         return;
       }
-      chatId=resolved.id;
-      const m=[...resolved.arr].reverse().find(x=>x.role==='assistant'&&usageOf(x));
-      if(!m){ lastSignature=''; body.innerHTML='<div class="tr-muted">이 방의 최신 응답에는 토큰 usage가 없습니다.</div>'; return; }
+      chatId=targetChatId;
+      const data=await apiFetch(`/chats/${encodeURIComponent(chatId)}/messages?limit=20`);
+      const arr=Array.isArray(data)?data:(data?.items||data?.messages||[]);
+      const m=[...arr].reverse().find(x=>x.role==='assistant'&&usageOf(x));
+      if(!m){ lastReceipt=null; lastSignature=''; body.innerHTML='<div class="tr-muted">이 방의 최신 응답에는 토큰 usage가 없습니다.</div>'; return; }
       const g=usageOf(m), sig=`${chatId}:${m.id}:${JSON.stringify(g)}:${JSON.stringify(cfg)}`;
+      lastReceipt={message:m,usage:g};
       if(!force&&sig===lastSignature)return;
       lastSignature=sig; render(m,g); if(!root.hidden) requestAnimationFrame(placePanel);
     }catch(e){ body.innerHTML=`<div class="tr-warn">영수증 조회 실패: ${esc(e?.message||e)}</div>`; }
-    finally{refreshBusy=false;}
+    finally{
+      refreshBusy=false;
+      if(refreshQueued){
+        const nextChatId=queuedChatId;
+        refreshQueued=false; queuedChatId=null;
+        if(!root.hidden) void refresh(true,nextChatId);
+      }
+    }
+  }
+  function scheduleRefresh(preferredChatId=null,delay=250){
+    if(domRefreshTimer!=null) clearTimeout(domRefreshTimer);
+    domRefreshTimer=setTimeout(()=>{
+      domRefreshTimer=null;
+      if(!root.hidden) void refresh(false,preferredChatId);
+    },delay);
   }
   const ICON=44, EDGE=8;
   const anchor=()=>({
@@ -363,13 +368,26 @@
   on(root.querySelector('[data-act=help]'),'click',()=>{root.classList.toggle('tr-help-open');requestAnimationFrame(placePanel)});
   on(root.querySelector('[data-act=refresh]'),'click',()=>refresh(true));
   on(document,'keydown',event=>{if(!root.hidden&&event.key==='Escape')closePanel()});
+  on(document,'click',event=>{
+    const row=event.target instanceof Element?event.target.closest('[data-chat-id]'):null;
+    const selectedId=row?.getAttribute('data-chat-id');
+    if(!selectedId) return;
+    const changed=selectedId!==chatId;
+    chatId=selectedId; lastSignature='';
+    if(!root.hidden&&changed) scheduleRefresh(selectedId,350);
+  },true);
+  on(window,'marinara:generation-complete',event=>{
+    const generatedChatId=String(event?.detail?.chatId||'');
+    if(!generatedChatId||root.hidden||generatedChatId!==currentChatId()) return;
+    chatId=generatedChatId; lastSignature='';
+    scheduleRefresh(generatedChatId,100);
+  });
   storage.get().then(async saved=>{
     const state=saved?.value&&typeof saved.value==='object'?saved.value:saved;
     cfg={...defaults,...(state?.config||{})};
     placeButton();
-    await refresh(true);
     await updateFx(false);
-  }).catch(()=>{placeButton();refresh(true)});
+  }).catch(()=>{placeButton()});
   on(window,'resize',()=>{cfg.position=clampAnchor(anchor().x,anchor().y);placeButton();if(!root.hidden)placePanel()});
-  on(window,'focus',()=>{refresh();updateFx(false)}); setInterval(()=>refresh(),2500); setInterval(()=>updateFx(false),FX_TTL);
+  setInterval(()=>updateFx(false),FX_TTL);
 })(marinara);
