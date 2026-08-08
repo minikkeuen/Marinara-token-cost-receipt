@@ -6,9 +6,6 @@
   }
 
   const storage = marinara.storage;
-  const setInterval = marinara.setInterval.bind(marinara);
-  const setTimeout = marinara.setTimeout.bind(marinara);
-  const clearTimeout = marinara.clearTimeout.bind(marinara);
   const addStyle = css => {
     const style = document.createElement('style');
     style.dataset.tokenCostReceipt = marinara.extension.id;
@@ -59,19 +56,19 @@
   };
 
   const ROOT = 'mari-token-receipt';
-  const BUTTON = `${ROOT}-button`;
-  if (document.getElementById(ROOT) || document.getElementById(BUTTON)) return;
+  const MESSAGE_BUTTON = `${ROOT}-message-button`;
+  if (document.getElementById(ROOT)) return;
   addStyle(`
-#${BUTTON}{position:fixed;right:18px;bottom:18px;z-index:9997;display:grid;width:44px;height:44px;place-items:center;border:1px solid var(--border,#444);border-radius:9999px;background:var(--background,#171717);color:var(--foreground,#eee);box-shadow:0 8px 24px #0006;cursor:grab;touch-action:none;user-select:none;font:20px/1 system-ui,sans-serif} #${BUTTON}[data-dragging="true"]{cursor:grabbing;opacity:.85}
-#${ROOT}[hidden]{display:none} #${ROOT}{position:fixed;z-index:9998;width:min(340px,calc(100vw - 24px));max-height:75vh;color:var(--foreground,#eee);background:var(--background,#171717);border:1px solid var(--border,#444);border-radius:14px;box-shadow:0 14px 42px #0008;font:12px/1.45 system-ui,sans-serif;overflow:hidden}
-#${ROOT} *{box-sizing:border-box} #${ROOT} .tr-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border,#444);font-weight:700} #${ROOT} .tr-head span{margin-right:auto} #${ROOT} .tr-head button{flex:0 0 auto} #${ROOT} .tr-help{display:none;padding:12px;overflow:auto;max-height:calc(75vh - 45px)} #${ROOT}.tr-help-open .tr-body{display:none} #${ROOT}.tr-help-open .tr-help{display:block} #${ROOT} .tr-help h3{font-size:13px;margin:0 0 8px} #${ROOT} .tr-help h4{font-size:12px;margin:12px 0 4px} #${ROOT} .tr-help ul{margin:4px 0;padding-left:18px} #${ROOT} .tr-help li{margin:4px 0} #${ROOT} .tr-help code{font-size:11px} #${ROOT} .tr-note{margin-top:10px;padding:8px;border:1px solid color-mix(in srgb,#f5b84b 45%,var(--border,#444));border-radius:8px;background:color-mix(in srgb,#f5b84b 10%,var(--background,#171717))} #${ROOT} button{border:1px solid var(--border,#555);background:var(--secondary,#292929);color:inherit;border-radius:8px;padding:4px 8px;cursor:pointer} #${ROOT} .tr-body{padding:12px;overflow:auto;max-height:calc(75vh - 45px)} #${ROOT} .tr-muted{opacity:.67} #${ROOT} .tr-title{font-size:13px;font-weight:700;word-break:break-all;margin-bottom:8px} #${ROOT} .tr-row{display:flex;justify-content:space-between;gap:12px;padding:3px 0} #${ROOT} .tr-usage{display:grid;grid-template-columns:minmax(0,1fr) 82px auto;align-items:baseline;gap:8px} #${ROOT} .tr-tokens{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap} #${ROOT} .tr-total{border-top:1px solid var(--border,#444);margin-top:7px;padding-top:8px;font-weight:800;font-size:14px} #${ROOT} details{margin-top:10px;border-top:1px solid var(--border,#444);padding-top:8px} #${ROOT} input,#${ROOT} select{width:100%;margin:3px 0 7px;padding:6px;border:1px solid var(--border,#555);border-radius:7px;background:var(--background,#181818);color:inherit} #${ROOT} .tr-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 8px} #${ROOT} .tr-preset{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px;margin:8px 0} #${ROOT} .tr-preset select{margin-bottom:0} #${ROOT} .tr-preset button{min-height:31px;white-space:nowrap} #${ROOT} label{display:block;font-size:11px;opacity:.82} #${ROOT} .tr-warn{color:#f5b84b;margin-top:8px} #${ROOT} .tr-tier{margin:7px 0 3px;padding:7px 8px;border:1px solid color-mix(in srgb,#f5b84b 38%,var(--border,#444));border-radius:8px;background:color-mix(in srgb,#f5b84b 8%,var(--background,#171717));color:#f5c66d;font-weight:650}
+.${MESSAGE_BUTTON}[aria-busy="true"]{cursor:wait;opacity:.45}.${MESSAGE_BUTTON} svg{pointer-events:none}
+#${ROOT}[hidden]{display:none} #${ROOT}{position:fixed;z-index:9998;display:flex;flex-direction:column;width:min(360px,calc(100vw - 24px));max-height:min(78vh,640px);color:var(--foreground,#eee);background:var(--card,var(--background,#171717));border:1px solid var(--border,#444);border-radius:12px;box-shadow:0 14px 42px color-mix(in srgb,#050312 55%,transparent);font:12px/1.45 system-ui,sans-serif;overflow:hidden}
+#${ROOT} *{box-sizing:border-box} #${ROOT} .tr-head{display:flex;flex:0 0 auto;align-items:center;gap:6px;padding:9px 10px 9px 12px;border-bottom:1px solid var(--border,#444);font-weight:700} #${ROOT} .tr-head span{margin-right:auto} #${ROOT} button{border:1px solid var(--border,#555);background:var(--secondary,#292929);color:inherit;border-radius:7px;padding:5px 8px;cursor:pointer;font:inherit} #${ROOT} .tr-icon-btn{display:grid;width:28px;height:28px;place-items:center;border-color:transparent;background:transparent;padding:0;font-size:15px} #${ROOT} .tr-icon-btn:hover{border-color:var(--border,#555);background:var(--secondary,#292929)} #${ROOT} .tr-body{min-height:0;flex:1;padding:12px;overflow:auto;overscroll-behavior:contain} #${ROOT} .tr-muted{opacity:.67} #${ROOT} .tr-title{font-size:13px;font-weight:700;word-break:break-all;margin-bottom:8px} #${ROOT} .tr-row{display:flex;justify-content:space-between;gap:12px;padding:3px 0} #${ROOT} .tr-usage{display:grid;grid-template-columns:minmax(0,1fr) 82px auto;align-items:baseline;gap:8px} #${ROOT} .tr-tokens{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap} #${ROOT} .tr-total{border-top:1px solid var(--border,#444);margin-top:7px;padding-top:8px;font-weight:800;font-size:14px} #${ROOT} details{margin-top:10px;border-top:1px solid var(--border,#444);padding-top:8px} #${ROOT} input,#${ROOT} select{width:100%;margin:3px 0 7px;padding:6px;border:1px solid var(--border,#555);border-radius:7px;background:var(--background,#181818);color:inherit} #${ROOT} input[type="checkbox"]{width:16px;height:16px;margin:0;accent-color:var(--primary,#ffb3d9)} #${ROOT} .tr-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 8px} #${ROOT} .tr-preset{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:8px;margin:8px 0} #${ROOT} .tr-preset select{margin-bottom:0} #${ROOT} .tr-preset button{min-height:31px;white-space:nowrap} #${ROOT} label{display:block;font-size:11px;opacity:.82} #${ROOT} .tr-toggle{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid color-mix(in srgb,var(--border,#444) 60%,transparent)} #${ROOT} .tr-toggle span{display:grid;gap:2px} #${ROOT} .tr-toggle small{color:var(--muted-foreground,#aaa);font-size:10px;line-height:1.35} #${ROOT} .tr-settings-title{margin:0 0 5px;font-size:13px} #${ROOT} .tr-settings-actions{display:flex;gap:7px;margin-top:10px} #${ROOT} .tr-warn{color:#f5b84b;margin-top:8px} #${ROOT} .tr-error{color:var(--destructive,#ff6b9d)} #${ROOT} .tr-tier{margin:7px 0 3px;padding:7px 8px;border:1px solid color-mix(in srgb,#f5b84b 38%,var(--border,#444));border-radius:8px;background:color-mix(in srgb,#f5b84b 8%,var(--background,#171717));color:#f5c66d;font-weight:650}
+@media(max-width:520px){#${ROOT}{left:12px!important;right:12px!important;bottom:calc(12px + env(safe-area-inset-bottom))!important;top:auto!important;width:auto;max-height:70vh}}
   `);
-  const toggle = addElement(document.body, 'button', { id:BUTTON, type:'button', title:'Token Receipt — 드래그로 이동', 'aria-label':'Token Receipt', textContent:'🧾' });
-  const root = addElement(document.body, 'section', { id:ROOT, hidden:'', role:'dialog', 'aria-label':'Token Receipt' });
-  if (!root || !toggle) return;
-  root.innerHTML = `<div class="tr-head"><span>🧾 Token Receipt</span><button data-act="help" title="사용법" aria-label="사용법">?</button><button data-act="refresh" title="영수증 새로고침" aria-label="영수증 새로고침">↻</button><button data-act="close" title="닫기" aria-label="닫기">×</button></div><div class="tr-body"><div class="tr-muted">채팅 usage를 기다리는 중…</div></div><div class="tr-help"><h3>간단 설정</h3><ol><li>모델 가격표에서 <b>100만 토큰당 가격 (1M)</b>을 입력합니다.</li><li>가격표에 없는 항목은 <b>0</b>으로 둡니다.</li><li>아래에서 차감 방식을 고르고 저장합니다.</li></ol><h4>뭘 고르나요?</h4><ul><li><b>캐시 읽기가 0:</b> 그대로 과금</li><li><b>Claude 공식 API:</b> 그대로 과금</li><li><b>OpenAI·DeepSeek 공식 API:</b> cache read 차감</li><li><b>Gemini·GLM·OpenRouter:</b> 우선 그대로 과금</li></ul><div class="tr-note">OpenRouter는 <b>OpenRouter 가격표</b>를 사용하세요.</div><div class="tr-muted" style="margin-top:10px">표시 금액은 세금·카드 수수료를 제외한 예상액입니다.</div></div>`;
+  const root = addElement(document.body, 'section', { id:ROOT, hidden:'', role:'dialog', 'aria-label':'메시지 토큰 영수증' });
+  if (!root) return;
+  root.innerHTML = `<div class="tr-head"><span>메시지 영수증</span><button type="button" class="tr-icon-btn" data-act="settings" title="조회 방식 설정" aria-label="조회 방식 설정">⚙</button><button type="button" class="tr-icon-btn" data-act="close" title="닫기" aria-label="닫기">×</button></div><div class="tr-body"><div class="tr-muted">메시지의 영수증 아이콘을 눌러 주세요.</div></div>`;
   const body = root.querySelector('.tr-body');
-  const defaults = { currency:'USD', input:0, read:0, write:0, output:0, adjustment:'none', cacheTtl:'5m', profiles:{}, fx:null, position:null };
+  const defaults = { currency:'USD', input:0, read:0, write:0, output:0, adjustment:'none', cacheTtl:'5m', profiles:{}, fx:null, sources:{rpScreen:true,rpPeekFallback:false,conversationPeek:true} };
   const FX_TTL = 6 * 60 * 60 * 1000;
   const PRESET_GROUPS = [
     { label:'OpenAI', items:[
@@ -113,14 +110,7 @@
     ]},
   ];
   const PRESETS = PRESET_GROUPS.flatMap(group=>group.items);
-  let cfg = { ...defaults }, chatId = null, lastSignature = '', lastReceipt = null;
-  let refreshBusy = false, refreshQueued = false, queuedChatId = null, domRefreshTimer = null;
-  const isVisible = el => {
-    if (!(el instanceof Element) || !el.isConnected) return false;
-    const style=getComputedStyle(el), r=el.getBoundingClientRect();
-    return style.display!=='none' && style.visibility!=='hidden' && Number(style.opacity)!==0 && r.width>0 && r.height>0 && r.bottom>0 && r.right>0 && r.top<innerHeight && r.left<innerWidth;
-  };
-  const professorWindowVisible = () => [...document.querySelectorAll('[data-component="HomeProfessorMariChat.Window"]')].some(isVisible);
+  let cfg = { ...defaults }, lastReceipt = null, anchorButton = null, activeRequest = null, showingSettings = false;
   const num = v => Number.isFinite(Number(v)) ? Number(v) : 0;
   const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const money = v => `${cfg.currency} ${v < .01 ? v.toFixed(6) : v.toFixed(4)}`;
@@ -140,8 +130,8 @@
       cfg.fx={...(cfg.fx||{}),rate:num(cfg.fx?.rate),source:'Frankfurter',error:String(e?.message||e),lastAttemptAt:Date.now()};
     }
     await storage.patch({config:cfg}).catch(()=>{});
-    lastSignature='';
-    if(lastReceipt) render(lastReceipt.message,lastReceipt.usage);
+    if(showingSettings) renderSettings();
+    else if(lastReceipt) render(lastReceipt.message,lastReceipt.usage,lastReceipt.source);
   }
   function activeSidebarChatId(){
     for(const row of document.querySelectorAll('[data-chat-id]')){
@@ -157,12 +147,45 @@
     }
     return null;
   }
-  function currentChatId(preferred=null){
-    if(professorWindowVisible()) return null;
-    return preferred||activeSidebarChatId()||chatId||latestRequestedChatId();
+  function currentChatId(){
+    return activeSidebarChatId()||latestRequestedChatId();
   }
-  function usageOf(m){ const e=typeof m.extra==='string'?(()=>{try{return JSON.parse(m.extra)}catch{return {}}})():m.extra||{}; return e.generationInfo||null; }
-  function profileFor(g){ const key=`${g.provider||''}::${g.model||''}`; return { key, ...(cfg.profiles[key]||cfg) }; }
+  function inferProvider(model){
+    const value=String(model||'').toLowerCase();
+    if(value.startsWith('claude-')||value.startsWith('anthropic/')) return 'anthropic';
+    if(value.startsWith('gemini-')||value.startsWith('google/')) return 'google';
+    if(value.startsWith('deepseek-')||value.startsWith('deepseek/')) return 'deepseek';
+    if(value.startsWith('glm-')||value.startsWith('zhipu/')) return 'zhipu';
+    if(value.startsWith('kimi-')||value.startsWith('moonshot/')) return 'moonshot';
+    if(/^(?:gpt-|o\d|chatgpt-)/.test(value)||value.startsWith('openai/')) return 'openai';
+    return 'unknown';
+  }
+  const parseTokenNumber = value => {
+    const digits=String(value??'').replace(/[^0-9.-]/g,'');
+    return digits&&Number.isFinite(Number(digits))?Number(digits):null;
+  };
+  function usageFromScreen(messageElement){
+    const label=[...messageElement.querySelectorAll('[title]')]
+      .map(element=>element.getAttribute('title')||'')
+      .find(value=>/\d[\d,.]*\s*→\s*(?:\d[\d,.]*|\?)\s*tok/i.test(value));
+    if(!label) return null;
+    const tokenMatch=label.match(/([\d,.]+)\s*→\s*([\d,.]+|\?)\s*tok/i);
+    const model=String(label.split('·')[0]||'').trim();
+    const tokensPrompt=parseTokenNumber(tokenMatch?.[1]);
+    const tokensCompletion=parseTokenNumber(tokenMatch?.[2]);
+    if(!model||tokensPrompt==null||tokensCompletion==null) return null;
+    return {
+      provider:inferProvider(model), model,
+      tokensPrompt, tokensCompletion,
+      tokensCachedPrompt:parseTokenNumber(label.match(/cache\s+hit\s+([\d,.]+)/i)?.[1])||0,
+      tokensCacheWritePrompt:parseTokenNumber(label.match(/cache\s+write\s+([\d,.]+)/i)?.[1])||0,
+    };
+  }
+  function profileFor(g){
+    const key=`${g.provider||''}::${g.model||''}`;
+    const byModel=Object.entries(cfg.profiles||{}).find(([savedKey])=>savedKey.endsWith(`::${g.model||''}`))?.[1];
+    return { key, ...(cfg.profiles[key]||byModel||cfg) };
+  }
   function presetIsActive(p,now=Date.now()){
     return (!p.activeFrom||now>=Date.parse(p.activeFrom))&&(!p.activeUntil||now<Date.parse(p.activeUntil));
   }
@@ -208,10 +231,9 @@
     cfg.currency=root.querySelector('[name=currency]').value.trim()||'USD';
     cfg.profiles={...(cfg.profiles||{}),[key]:{input:q('input'),read:q('read'),write:q('write'),output:q('output'),adjustment:root.querySelector('[name=adjustment]').value,cacheTtl:root.querySelector('[name=cacheTtl]').value}};
     await storage.patch({config:cfg});
-    lastSignature='';
-    if(lastReceipt) render(lastReceipt.message,lastReceipt.usage);
+    if(lastReceipt) render(lastReceipt.message,lastReceipt.usage,lastReceipt.source);
   }
-  function render(m,g){
+  function render(m,g,source){
     const p=profileFor(g), c=compute(g,p), configured=[p.input,p.read,p.write,p.output].some(x=>num(x)>0);
     const suggested=currentPreset(g);
     const presetOptions=PRESET_GROUPS.map(group=>`<optgroup label="${esc(group.label)}">${group.items.map(item=>`<option value="${esc(item.id)}" ${suggested?.id===item.id?'selected':''}>${esc(item.label)}${suggested?.id===item.id?' (현재 모델)':''}</option>`).join('')}</optgroup>`).join('');
@@ -224,7 +246,7 @@
       ${c.tier?`<div class="tr-tier">장문 요금 적용: 입력 ${c.raw.toLocaleString()} &gt; ${c.tier.threshold.toLocaleString()}토큰</div>`:''}
       ${String(cfg.currency).toUpperCase()==='USD'?`<div class="tr-row"><span>현재 환율 원화 예상액</span><b>${won(c.total)}</b></div><div class="tr-muted">USD 1 = ₩${num(cfg.fx?.rate).toLocaleString('ko-KR')} · 기준 ${esc(cfg.fx?.marketDate||'')} · 갱신 ${esc(fxTime())}</div>${cfg.fx?.error?`<div class="tr-warn">환율 갱신 실패: ${esc(cfg.fx.error)}</div>`:''}`:''}
       ${configured?'':'<div class="tr-warn">단가가 0입니다. 아래에서 공급자 가격표를 입력하세요.</div>'}
-      <div class="tr-muted">API 보고 input: ${c.raw.toLocaleString()} · 메시지 ${esc(m.id||'')}</div>
+      <div class="tr-muted">기록된 input: ${c.raw.toLocaleString()} · 메시지 ${esc(m.id||'')}</div>
       <details><summary>이 모델 단가 설정 (1M 토큰당)</summary><div class="tr-preset"><label>모델 단가 프리셋<select name="preset">${presetOptions}</select></label><button data-act="load-preset">값 불러오기</button></div><label data-field="cache-ttl">Claude 캐시 쓰기 TTL<select name="cacheTtl"><option value="5m" ${p.cacheTtl!=='1h'?'selected':''}>5분</option><option value="1h" ${p.cacheTtl==='1h'?'selected':''}>1시간</option></select></label><div class="tr-muted" data-field="cache-ttl-note">실제 TTL은 Marinara의 Anthropic 연결 설정에서 별도로 선택합니다.</div><div class="tr-grid">
       <label>일반 입력<input name="input" type="number" step="any" value="${num(p.input)}"></label><label>캐시 읽기<input name="read" type="number" step="any" value="${num(p.read)}"></label>
       <label>캐시 쓰기<input name="write" type="number" step="any" value="${num(p.write)}"></label><label>출력 (추론 포함)<input name="output" type="number" step="any" value="${num(p.output)}"></label></div>
@@ -254,140 +276,139 @@
     });
     body.querySelector('[data-act=save]').addEventListener('click',()=>saveProfile(g));
     body.querySelector('[data-act=fx]')?.addEventListener('click',async()=>{ body.querySelector('[data-act=fx]').textContent='갱신 중…'; await updateFx(true); });
+    body.querySelector('details')?.addEventListener('toggle',()=>requestAnimationFrame(placePanel));
   }
-  async function refresh(force=false, preferredChatId=null){
-    const targetChatId=currentChatId(preferredChatId);
-    if(refreshBusy){
-      refreshQueued=true;
-      queuedChatId=targetChatId||queuedChatId;
-      return;
-    }
-    refreshBusy=true;
+  function renderSettings(){
+    showingSettings=true;
+    const sources={...defaults.sources,...(cfg.sources||{})};
+    body.innerHTML=`<h3 class="tr-settings-title">조회 방식</h3>
+      <label class="tr-toggle"><input type="checkbox" name="rpScreen" ${sources.rpScreen?'checked':''}><span><b>RP 화면 정보</b><small>화면 표시값 사용 (데이터 사용 없음)</small></span></label>
+      <label class="tr-toggle"><input type="checkbox" name="rpPeekFallback" ${sources.rpPeekFallback?'checked':''}><span><b>RP Peek Prompt 보완</b><small>메시지의 전체 프롬프트 1회 조회 (데이터 사용)</small></span></label>
+      <label class="tr-toggle"><input type="checkbox" name="conversationPeek" ${sources.conversationPeek?'checked':''}><span><b>대화모드 Peek Prompt</b><small>메시지의 전체 프롬프트 1회 조회 (데이터 사용)</small></span></label>
+      <div class="tr-settings-actions"><button type="button" data-act="save-sources">저장</button>${String(cfg.currency).toUpperCase()==='USD'?'<button type="button" data-act="fx">환율 수동 갱신</button>':''}</div>
+      <div class="tr-muted" style="margin-top:8px">환율: ${num(cfg.fx?.rate)?`USD 1 = ₩${num(cfg.fx.rate).toLocaleString('ko-KR')} · ${esc(fxTime())}`:'저장된 환율 없음'}</div>`;
+    body.querySelector('[data-act=save-sources]').addEventListener('click',async()=>{
+      cfg.sources={rpScreen:body.querySelector('[name=rpScreen]').checked,rpPeekFallback:body.querySelector('[name=rpPeekFallback]').checked,conversationPeek:body.querySelector('[name=conversationPeek]').checked};
+      await storage.patch({config:cfg});
+      body.querySelector('[data-act=save-sources]').textContent='저장됨';
+    });
+    body.querySelector('[data-act=fx]')?.addEventListener('click',async()=>{
+      body.querySelector('[data-act=fx]').textContent='갱신 중…';
+      await updateFx(true);
+    });
+    requestAnimationFrame(placePanel);
+  }
+  function placePanel(){
+    if(root.hidden||!anchorButton?.isConnected||innerWidth<=520) return;
+    const rect=anchorButton.getBoundingClientRect(), panelWidth=Math.min(360,innerWidth-24);
+    root.style.right='auto'; root.style.bottom='auto';
+    root.style.left=`${Math.min(Math.max(12,rect.left-panelWidth/2+rect.width/2),Math.max(12,innerWidth-panelWidth-12))}px`;
+    const below=rect.bottom+8;
+    if(below+root.offsetHeight<=innerHeight-12) root.style.top=`${below}px`;
+    else root.style.top=`${Math.max(12,rect.top-root.offsetHeight-8)}px`;
+  }
+  function closePanel(){
+    activeRequest?.abort(); activeRequest=null;
+    root.hidden=true; showingSettings=false; lastReceipt=null; anchorButton=null;
+    for(const button of document.querySelectorAll(`.${MESSAGE_BUTTON}[aria-expanded="true"]`)) button.setAttribute('aria-expanded','false');
+  }
+  function showError(message,detail=''){
+    body.innerHTML=`<div class="tr-error"><b>${esc(message)}</b></div>${detail?`<div class="tr-muted" style="margin-top:7px">${esc(detail)}</div>`:''}`;
+    requestAnimationFrame(placePanel);
+  }
+  async function usageFromPeek(messageId){
+    const chatId=currentChatId();
+    if(!chatId) throw new Error('현재 채팅 ID를 찾지 못했습니다. 채팅을 다시 선택해 주세요.');
+    activeRequest?.abort();
+    const request=new AbortController();
+    activeRequest=request;
     try{
-      if(!targetChatId){
-        chatId=null; lastSignature='';
-        body.innerHTML=professorWindowVisible()?'<div class="tr-muted">교수님 홈 대화는 토큰 usage가 저장되지 않아 계산할 수 없습니다.</div>':'<div class="tr-muted">현재 보이는 채팅을 확인하는 중…</div>';
+      const data=await apiFetch(`/chats/${encodeURIComponent(chatId)}/peek-prompt`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messageId}),signal:request.signal});
+      if(!data?.generationInfo) throw new Error('이 메시지에는 저장된 generationInfo가 없습니다.');
+      const usage={...data.generationInfo};
+      if(!usage.provider||usage.provider==='custom'||usage.provider==='unknown') usage.provider=inferProvider(usage.model);
+      return usage;
+    }finally{
+      if(activeRequest===request) activeRequest=null;
+    }
+  }
+  async function openReceipt(messageElement,button){
+    activeRequest?.abort(); activeRequest=null;
+    for(const other of document.querySelectorAll(`.${MESSAGE_BUTTON}[aria-expanded="true"]`)) other.setAttribute('aria-expanded','false');
+    anchorButton=button; button.setAttribute('aria-expanded','true');
+    root.hidden=false; showingSettings=false; lastReceipt=null;
+    body.innerHTML='<div class="tr-muted">토큰 사용량을 읽는 중…</div>';
+    requestAnimationFrame(placePanel);
+    const messageId=messageElement.getAttribute('data-message-id');
+    const isConversation=Boolean(messageElement.closest('[data-component="ChatArea.Conversation"]'));
+    const sources={...defaults.sources,...(cfg.sources||{})};
+    try{
+      let usage=null, source='';
+      if(!isConversation&&sources.rpScreen){ usage=usageFromScreen(messageElement); if(usage) source='screen'; }
+      const allowPeek=isConversation?sources.conversationPeek:sources.rpPeekFallback;
+      if(!usage&&allowPeek){ button.setAttribute('aria-busy','true'); try{usage=await usageFromPeek(messageId);source='peek'}finally{button.removeAttribute('aria-busy')} }
+      if(root.hidden||anchorButton!==button) return;
+      if(!usage){
+        showError(isConversation?'대화모드 Peek Prompt 조회가 꺼져 있습니다.':'화면에서 모델·토큰 정보를 찾지 못했습니다.',isConversation?'설정에서 대화모드 Peek Prompt를 켜 주세요.':'Marinara의 모델명·토큰 사용량 표시를 켜거나 RP Peek Prompt 보완을 허용해 주세요.');
         return;
       }
-      chatId=targetChatId;
-      const data=await apiFetch(`/chats/${encodeURIComponent(chatId)}/messages?limit=20`);
-      const arr=Array.isArray(data)?data:(data?.items||data?.messages||[]);
-      const m=[...arr].reverse().find(x=>x.role==='assistant'&&usageOf(x));
-      if(!m){ lastReceipt=null; lastSignature=''; body.innerHTML='<div class="tr-muted">이 방의 최신 응답에는 토큰 usage가 없습니다.</div>'; return; }
-      const g=usageOf(m), sig=`${chatId}:${m.id}:${JSON.stringify(g)}:${JSON.stringify(cfg)}`;
-      lastReceipt={message:m,usage:g};
-      if(!force&&sig===lastSignature)return;
-      lastSignature=sig; render(m,g); if(!root.hidden) requestAnimationFrame(placePanel);
-    }catch(e){ body.innerHTML=`<div class="tr-warn">영수증 조회 실패: ${esc(e?.message||e)}</div>`; }
-    finally{
-      refreshBusy=false;
-      if(refreshQueued){
-        const nextChatId=queuedChatId;
-        refreshQueued=false; queuedChatId=null;
-        if(!root.hidden) void refresh(true,nextChatId);
+      lastReceipt={message:{id:messageId},usage,source};
+      render(lastReceipt.message,usage,source);
+      requestAnimationFrame(placePanel);
+    }catch(error){
+      if(error?.name==='AbortError') return;
+      showError('영수증 정보를 불러오지 못했습니다.',error?.message||String(error));
+    }
+  }
+  const RECEIPT_LABEL='이 메시지의 토큰 영수증';
+  const RECEIPT_ICON='<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-receipt-text" aria-hidden="true"><path d="M4 2v20l2-2 2 2 2-2 2 2 2-2 2 2 2-2 2 2V2l-2 2-2-2-2 2-2-2-2 2-2-2-2 2Z"/><path d="M16 8h-6"/><path d="M16 12h-6"/><path d="M13 16h-3"/></svg>';
+  function decorateMessage(messageElement){
+    if(!(messageElement instanceof Element)||messageElement.getAttribute('data-message-role')!=='assistant') return;
+    const actions=messageElement.querySelector('.mari-message-actions');
+    if(!actions||actions.querySelector(`.${MESSAGE_BUTTON}`)) return;
+    const button=document.createElement('button');
+    const referenceButton=[...actions.children].find(element=>element instanceof HTMLButtonElement);
+    const fallbackClass='inline-flex h-[1.7em] w-[1.7em] shrink-0 items-center justify-center rounded-md p-0 text-[0.8125rem] leading-none transition-all active:scale-90 text-foreground/40 hover:bg-foreground/10 hover:text-foreground/70';
+    button.type='button'; button.className=`${MESSAGE_BUTTON} ${referenceButton?.className||fallbackClass}`; button.innerHTML=RECEIPT_ICON;
+    button.title=RECEIPT_LABEL; button.setAttribute('aria-label',RECEIPT_LABEL); button.setAttribute('aria-expanded','false'); button.setAttribute('aria-controls',ROOT);
+    button.tabIndex=actions.getAttribute('aria-hidden')==='true'?-1:0;
+    button.addEventListener('click',event=>{
+      event.preventDefault(); event.stopPropagation();
+      if(!root.hidden&&anchorButton===button){closePanel();return}
+      void openReceipt(messageElement,button);
+    });
+    actions.insertBefore(button,actions.lastElementChild||null);
+  }
+  function decorateWithin(node){
+    if(!(node instanceof Element)) return;
+    if(node.matches('[data-message-id]')) decorateMessage(node);
+    const owner=node.matches('.mari-message-actions')?node.closest('[data-message-id]'):null;
+    if(owner) decorateMessage(owner);
+    for(const message of node.querySelectorAll('[data-message-id]')) decorateMessage(message);
+  }
+  const observer=new MutationObserver(records=>{
+    for(const record of records){
+      if(record.type==='attributes'&&record.target instanceof Element){
+        const button=record.target.querySelector(`.${MESSAGE_BUTTON}`);
+        if(button) button.tabIndex=record.target.getAttribute('aria-hidden')==='true'?-1:0;
       }
+      for(const node of record.addedNodes) decorateWithin(node);
     }
-  }
-  function scheduleRefresh(preferredChatId=null,delay=250){
-    if(domRefreshTimer!=null) clearTimeout(domRefreshTimer);
-    domRefreshTimer=setTimeout(()=>{
-      domRefreshTimer=null;
-      if(!root.hidden) void refresh(false,preferredChatId);
-    },delay);
-  }
-  const ICON=44, EDGE=8;
-  const anchor=()=>({
-    x:Number.isFinite(Number(cfg.position?.x))?num(cfg.position.x):Math.max(EDGE,innerWidth-ICON-18),
-    y:Number.isFinite(Number(cfg.position?.y))?num(cfg.position.y):Math.max(EDGE,innerHeight-ICON-18)
   });
-  const clampAnchor=(x,y)=>({
-    x:Math.min(Math.max(EDGE,Math.round(x)),Math.max(EDGE,innerWidth-ICON-EDGE)),
-    y:Math.min(Math.max(EDGE,Math.round(y)),Math.max(EDGE,innerHeight-ICON-EDGE))
-  });
-  const placeButton=()=>{
-    const a=clampAnchor(anchor().x,anchor().y);
-    toggle.style.left=`${a.x}px`; toggle.style.top=`${a.y}px`; toggle.style.right='auto'; toggle.style.bottom='auto';
-    return a;
-  };
-  const placePanel=()=>{
-    const rect=toggle.getBoundingClientRect(), panelWidth=Math.min(340,innerWidth-24);
-    root.style.left=`${Math.min(Math.max(12,rect.left),Math.max(12,innerWidth-panelWidth-12))}px`;
-    if(rect.top>innerHeight-rect.bottom){
-      const top=rect.top-root.offsetHeight-8;
-      if(top<12){root.style.top='12px';root.style.bottom='auto'}
-      else{root.style.top='auto';root.style.bottom=`${innerHeight-rect.top+8}px`}
-    }else{
-      const top=rect.bottom+8;
-      if(top+root.offsetHeight>innerHeight-12){root.style.top='auto';root.style.bottom='12px'}
-      else{root.style.bottom='auto';root.style.top=`${top}px`}
-    }
-  };
-  const openPanel=()=>{
-    root.hidden=false;
-    placePanel();
-    void refresh(false);
-  };
-  const closePanel=()=>{
-    root.classList.remove('tr-help-open');
-    root.hidden=true;
-  };
-
-  let drag=null;
-  on(toggle,'pointerdown',event=>{
-    if(event.button!==0&&event.pointerType==='mouse') return;
-    const rect=toggle.getBoundingClientRect();
-    drag={pointerId:event.pointerId,startX:event.clientX,startY:event.clientY,offsetX:event.clientX-rect.left,offsetY:event.clientY-rect.top,moved:false};
-    try{toggle.setPointerCapture(event.pointerId)}catch{}
-  });
-  on(toggle,'pointermove',event=>{
-    if(!drag||event.pointerId!==drag.pointerId) return;
-    if(!drag.moved){
-      if(Math.hypot(event.clientX-drag.startX,event.clientY-drag.startY)<6) return;
-      drag.moved=true; toggle.dataset.dragging='true';
-    }
-    const a=clampAnchor(event.clientX-drag.offsetX,event.clientY-drag.offsetY);
-    toggle.style.left=`${a.x}px`; toggle.style.top=`${a.y}px`; toggle.style.right='auto'; toggle.style.bottom='auto';
-    if(!root.hidden) placePanel();
-  });
-  const endDrag=event=>{
-    if(!drag||event.pointerId!==drag.pointerId) return;
-    const moved=drag.moved; drag=null; delete toggle.dataset.dragging;
-    try{toggle.releasePointerCapture(event.pointerId)}catch{}
-    if(!moved){
-      if(root.hidden) openPanel(); else closePanel();
-      return;
-    }
-    const rect=toggle.getBoundingClientRect();
-    cfg.position=clampAnchor(rect.left,rect.top);
-    void storage.patch({config:cfg}).catch(()=>{});
-    if(!root.hidden) placePanel();
-  };
-  on(toggle,'pointerup',endDrag);
-  on(toggle,'pointercancel',endDrag);
+  observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['aria-hidden']});
+  marinara.onCleanup(()=>{observer.disconnect();activeRequest?.abort();document.querySelectorAll(`.${MESSAGE_BUTTON}`).forEach(button=>button.remove())});
   on(root.querySelector('[data-act=close]'),'click',closePanel);
-  on(root.querySelector('[data-act=help]'),'click',()=>{root.classList.toggle('tr-help-open');requestAnimationFrame(placePanel)});
-  on(root.querySelector('[data-act=refresh]'),'click',()=>refresh(true));
-  on(document,'keydown',event=>{if(!root.hidden&&event.key==='Escape')closePanel()});
-  on(document,'click',event=>{
-    const row=event.target instanceof Element?event.target.closest('[data-chat-id]'):null;
-    const selectedId=row?.getAttribute('data-chat-id');
-    if(!selectedId) return;
-    const changed=selectedId!==chatId;
-    chatId=selectedId; lastSignature='';
-    if(!root.hidden&&changed) scheduleRefresh(selectedId,350);
-  },true);
-  on(window,'marinara:generation-complete',event=>{
-    const generatedChatId=String(event?.detail?.chatId||'');
-    if(!generatedChatId||root.hidden||generatedChatId!==currentChatId()) return;
-    chatId=generatedChatId; lastSignature='';
-    scheduleRefresh(generatedChatId,100);
+  on(root.querySelector('[data-act=settings]'),'click',()=>{
+    if(showingSettings&&lastReceipt){showingSettings=false;render(lastReceipt.message,lastReceipt.usage,lastReceipt.source);requestAnimationFrame(placePanel)}
+    else renderSettings();
   });
-  storage.get().then(async saved=>{
+  on(document,'keydown',event=>{if(!root.hidden&&event.key==='Escape')closePanel()});
+  on(document,'pointerdown',event=>{if(!root.hidden&&event.target instanceof Node&&!root.contains(event.target)&&!event.target.closest?.(`.${MESSAGE_BUTTON}`))closePanel()},true);
+  on(window,'resize',placePanel);
+  storage.get().then(saved=>{
     const state=saved?.value&&typeof saved.value==='object'?saved.value:saved;
-    cfg={...defaults,...(state?.config||{})};
-    placeButton();
-    await updateFx(false);
-  }).catch(()=>{placeButton()});
-  on(window,'resize',()=>{cfg.position=clampAnchor(anchor().x,anchor().y);placeButton();if(!root.hidden)placePanel()});
-  setInterval(()=>updateFx(false),FX_TTL);
+    const savedConfig=state?.config||{};
+    cfg={...defaults,...savedConfig,sources:{...defaults.sources,...(savedConfig.sources||{})}};
+  }).catch(()=>{});
+  decorateWithin(document.body);
 })(marinara);

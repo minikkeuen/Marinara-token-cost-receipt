@@ -3,8 +3,8 @@
   "version": 1,
   "config": {
     "name": "Token Cost Receipt",
-    "version": "2.0.1",
-    "description": "Shows estimated token cost with event-driven active-chat refreshes, model presets, Claude cache TTL rates, automatic long-context tiers, and cached USD/KRW conversion in Marinara Engine 2.4.1.",
+    "version": "3.0.0",
+    "description": "Adds per-message token receipt buttons with zero-request RP screen parsing and click-only Peek Prompt fallback for Marinara Engine 2.4.1.",
     "runtime": "client",
     "enabled": false,
     "capabilities": [
