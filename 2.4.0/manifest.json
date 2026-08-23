@@ -3,8 +3,8 @@
   "version": 1,
   "config": {
     "name": "Token Cost Receipt",
-    "version": "3.0.0",
-    "description": "Adds per-message token receipt buttons with zero-request RP screen parsing and click-only Peek Prompt fallback for Marinara Engine 2.4.1.",
+    "version": "3.0.5",
+    "description": "Adds per-message token receipt buttons, createdAt-based RP date/time display, and historical DeepSeek V4 pricing with peak/off-peak and weekend rules for Marinara Engine 2.4.1.",
     "runtime": "client",
     "enabled": false,
     "capabilities": [

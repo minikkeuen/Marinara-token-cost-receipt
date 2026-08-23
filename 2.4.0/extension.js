@@ -69,6 +69,7 @@
   root.innerHTML = `<div class="tr-head"><span>메시지 영수증</span><button type="button" class="tr-icon-btn" data-act="help" title="사용법" aria-label="사용법" aria-pressed="false">?</button><button type="button" class="tr-icon-btn" data-act="settings" title="조회 방식 설정" aria-label="조회 방식 설정" aria-pressed="false">⚙</button><button type="button" class="tr-icon-btn" data-act="close" title="닫기" aria-label="닫기">×</button></div><div class="tr-body"><div class="tr-muted">메시지의 영수증 아이콘을 눌러 주세요.</div></div>`;
   const body = root.querySelector('.tr-body');
   const defaults = { currency:'USD', input:0, read:0, write:0, output:0, adjustment:'none', cacheTtl:'5m', profiles:{}, fx:null, sources:{rpScreen:true,rpPeekFallback:false,conversationPeek:true} };
+  const CHAT_MESSAGES_TTL = 15 * 1000;
   const FX_TTL = 6 * 60 * 60 * 1000;
   const PRESET_GROUPS = [
     { label:'OpenAI', items:[
@@ -91,14 +92,15 @@
       {id:'claude-sonnet-4-6',label:'Claude Sonnet 4.6',input:3,read:.3,write:3.75,write1h:6,output:15,adjustment:'none'},
     ]},
     { label:'Google Gemini', items:[
+      {id:'gemini-3.7-flash',label:'Gemini 3.7 Flash',input:.75,read:.075,write:0,output:3.75,adjustment:'none'},
       {id:'gemini-3.6-flash',label:'Gemini 3.6 Flash',input:1.5,read:.15,write:0,output:7.5,adjustment:'none'},
       {id:'gemini-3.5-flash',label:'Gemini 3.5 Flash',input:1.5,read:.15,write:0,output:9,adjustment:'none'},
       {id:'gemini-3.1-pro-preview',label:'Gemini 3.1 Pro Preview',input:2,read:.2,write:0,output:12,adjustment:'none'},
       {id:'gemini-3.1-flash-lite',label:'Gemini 3.1 Flash-Lite',input:.25,read:.025,write:0,output:1.5,adjustment:'none'},
     ]},
     { label:'DeepSeek', items:[
-      {id:'deepseek-v4-pro',label:'DeepSeek V4 Pro',input:.435,read:.003625,write:0,output:.87,adjustment:'subtract-read'},
-      {id:'deepseek-v4-flash',label:'DeepSeek V4 Flash',input:.14,read:.0028,write:0,output:.28,adjustment:'subtract-read'},
+      {id:'deepseek-v4-pro',label:'DeepSeek V4 Pro',input:.66,read:.022,write:0,output:1.98,adjustment:'subtract-read',dynamicPricing:'deepseek-v4'},
+      {id:'deepseek-v4-flash',label:'DeepSeek V4 Flash',input:.22,read:.007,write:0,output:.66,adjustment:'subtract-read',dynamicPricing:'deepseek-v4'},
     ]},
     { label:'GLM', items:[
       {id:'glm-5.2',label:'GLM-5.2',input:1.4,read:.26,write:0,output:4.4,adjustment:'none'},
@@ -110,7 +112,21 @@
     ]},
   ];
   const PRESETS = PRESET_GROUPS.flatMap(group=>group.items);
+  const DEEPSEEK_V4_RATES = {
+    'deepseek-v4-flash': {offPeak:{input:.22,read:.007,write:0,output:.66},peak:{input:.44,read:.014,write:0,output:1.32}},
+    'deepseek-v4-pro': {offPeak:{input:.66,read:.022,write:0,output:1.98},peak:{input:1.32,read:.044,write:0,output:3.96}},
+  };
+  const DEEPSEEK_V4_LEGACY_RATES = {
+    'deepseek-v4-flash': {input:.14,read:.0028,write:0,output:.28},
+    'deepseek-v4-pro': {input:.435,read:.003625,write:0,output:.87},
+  };
+  // New V4 peak/off-peak pricing began at 2026-08-17 00:00 Beijing time.
+  const DEEPSEEK_V4_TIER_START = Date.parse('2026-08-16T16:00:00Z');
+  // Weekend-wide off-peak billing began at 2026-08-23 00:00 Beijing time.
+  const DEEPSEEK_WEEKEND_RULE_START = Date.parse('2026-08-22T16:00:00Z');
   let cfg = { ...defaults }, lastReceipt = null, anchorButton = null, activeRequest = null, panelView = 'receipt';
+  let chatMessageCache = { chatId:null, loadedAt:0, byId:new Map(), promise:null };
+  let metadataSyncTimer = 0;
   const num = v => Number.isFinite(Number(v)) ? Number(v) : 0;
   const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const money = v => `${cfg.currency} ${v < .01 ? v.toFixed(6) : v.toFixed(4)}`;
@@ -164,6 +180,103 @@
     const digits=String(value??'').replace(/[^0-9.-]/g,'');
     return digits&&Number.isFinite(Number(digits))?Number(digits):null;
   };
+  function parseAbsoluteTimestamp(value){
+    if(value==null||value==='') return null;
+    if(typeof value==='number'||/^\d{10,13}$/.test(String(value).trim())){
+      const raw=Number(value), ms=raw<1e12?raw*1000:raw;
+      return Number.isFinite(ms)?ms:null;
+    }
+    const text=String(value).trim();
+    if(!/(?:\d{4}[-/.]\d{1,2}[-/.]\d{1,2}|T\d{2}:\d{2}|Z$|[+-]\d{2}:?\d{2}$)/.test(text)) return null;
+    const parsed=Date.parse(text);
+    return Number.isFinite(parsed)?parsed:null;
+  }
+  async function loadChatMessageMetadata(force=false){
+    const chatId=currentChatId();
+    if(!chatId) return null;
+    const now=Date.now();
+    if(chatMessageCache.chatId===chatId&&!force&&chatMessageCache.byId.size&&now-chatMessageCache.loadedAt<CHAT_MESSAGES_TTL) return chatMessageCache;
+    if(chatMessageCache.chatId===chatId&&chatMessageCache.promise) return chatMessageCache.promise;
+    const promise=(async()=>{
+      const messages=await apiFetch(`chats/${encodeURIComponent(chatId)}/messages`);
+      const rows=Array.isArray(messages)?messages:[];
+      const byId=new Map();
+      for(const message of rows){
+        if(!message?.id||!message?.createdAt) continue;
+        const timestamp=parseAbsoluteTimestamp(message.createdAt);
+        if(timestamp==null) continue;
+        byId.set(String(message.id),{createdAt:String(message.createdAt),timestamp});
+      }
+      chatMessageCache={chatId,loadedAt:Date.now(),byId,promise:null};
+      return chatMessageCache;
+    })().catch(error=>{
+      if(chatMessageCache.chatId===chatId) chatMessageCache.promise=null;
+      throw error;
+    });
+    chatMessageCache={
+      chatId,
+      loadedAt:chatMessageCache.chatId===chatId?chatMessageCache.loadedAt:0,
+      byId:chatMessageCache.chatId===chatId?chatMessageCache.byId:new Map(),
+      promise,
+    };
+    return promise;
+  }
+  function formatRpDateTime(timestamp){
+    const date=new Date(Number(timestamp));
+    if(!Number.isFinite(date.getTime())) return '';
+    const month=String(date.getMonth()+1).padStart(2,'0');
+    const day=String(date.getDate()).padStart(2,'0');
+    const time=date.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',hour12:true});
+    return `${month}.${day} ${time}`;
+  }
+  function applyCreatedAtToMessage(messageElement,meta){
+    if(!(messageElement instanceof Element)||!meta) return;
+    messageElement.dataset.tokenReceiptCreatedAt=meta.createdAt;
+    messageElement.dataset.tokenReceiptTimestamp=String(meta.timestamp);
+    if(messageElement.closest('[data-component="ChatArea.Conversation"]')) return;
+    const nameElement=messageElement.querySelector('.mari-message-name');
+    const timeElement=nameElement?.nextElementSibling;
+    if(!(timeElement instanceof HTMLElement)) return;
+    const formatted=formatRpDateTime(meta.timestamp);
+    if(!formatted) return;
+    timeElement.textContent=formatted;
+    timeElement.dataset.tokenReceiptDateTime='true';
+  }
+  async function createdAtForMessage(messageElement,forceIfMissing=true){
+    if(!(messageElement instanceof Element)) return null;
+    const cachedTimestamp=parseAbsoluteTimestamp(messageElement.dataset.tokenReceiptCreatedAt)||parseAbsoluteTimestamp(messageElement.dataset.tokenReceiptTimestamp);
+    if(cachedTimestamp!=null) return {createdAt:messageElement.dataset.tokenReceiptCreatedAt||new Date(cachedTimestamp).toISOString(),timestamp:cachedTimestamp};
+    const messageId=messageElement.getAttribute('data-message-id');
+    if(!messageId) return null;
+    let cache=await loadChatMessageMetadata(false).catch(()=>null);
+    let meta=cache?.byId?.get(String(messageId))||null;
+    if(!meta&&forceIfMissing){
+      cache=await loadChatMessageMetadata(true).catch(()=>null);
+      meta=cache?.byId?.get(String(messageId))||null;
+    }
+    if(meta) applyCreatedAtToMessage(messageElement,meta);
+    return meta;
+  }
+  async function syncVisibleMessageMetadata(){
+    const messages=[...document.querySelectorAll('[data-message-id]')];
+    if(!messages.length) return;
+    let cache=await loadChatMessageMetadata(false).catch(()=>null);
+    if(!cache) return;
+    const missing=messages.some(message=>!cache.byId.has(String(message.getAttribute('data-message-id')||'')));
+    if(missing) cache=await loadChatMessageMetadata(true).catch(()=>cache);
+    for(const message of messages){
+      const meta=cache?.byId?.get(String(message.getAttribute('data-message-id')||''));
+      if(meta) applyCreatedAtToMessage(message,meta);
+    }
+  }
+  function scheduleMetadataSync(){
+    if(metadataSyncTimer) clearTimeout(metadataSyncTimer);
+    metadataSyncTimer=setTimeout(()=>{metadataSyncTimer=0;void syncVisibleMessageMetadata()},60);
+  }
+  function messagePricingTime(messageElement){
+    const timestamp=parseAbsoluteTimestamp(messageElement?.dataset?.tokenReceiptCreatedAt)||parseAbsoluteTimestamp(messageElement?.dataset?.tokenReceiptTimestamp);
+    return timestamp==null?null:{timestamp,source:'message-createdAt'};
+  }
   function usageFromScreen(messageElement){
     const label=[...messageElement.querySelectorAll('[title]')]
       .map(element=>element.getAttribute('title')||'')
@@ -185,6 +298,43 @@
     const key=`${g.provider||''}::${g.model||''}`;
     const byModel=Object.entries(cfg.profiles||{}).find(([savedKey])=>savedKey.endsWith(`::${g.model||''}`))?.[1];
     return { key, ...(cfg.profiles[key]||byModel||cfg) };
+  }
+  function deepSeekModelId(value){
+    const model=String(value||'').toLowerCase().replace(/^deepseek\//,'');
+    if(/^deepseek-v4-flash(?:-|$)/.test(model)) return 'deepseek-v4-flash';
+    if(/^deepseek-v4-pro(?:-|$)/.test(model)) return 'deepseek-v4-pro';
+    return null;
+  }
+  function isDeepSeekWeekendBeijing(timestamp){
+    const beijing=new Date(Number(timestamp)+8*60*60*1000);
+    const day=beijing.getUTCDay();
+    return day===0||day===6;
+  }
+  function deepSeekPricingAt(modelOrId,now=Date.now()){
+    const id=DEEPSEEK_V4_RATES[modelOrId]?modelOrId:deepSeekModelId(modelOrId);
+    if(!id) return null;
+    const timestamp=Number(now);
+    if(!Number.isFinite(timestamp)) return null;
+    if(timestamp<DEEPSEEK_V4_TIER_START){
+      return {id,period:'legacy',historical:true,weekend:false,...DEEPSEEK_V4_LEGACY_RATES[id]};
+    }
+    if(timestamp>=DEEPSEEK_WEEKEND_RULE_START&&isDeepSeekWeekendBeijing(timestamp)){
+      return {id,period:'off-peak',historical:false,weekend:true,...DEEPSEEK_V4_RATES[id].offPeak};
+    }
+    const hour=new Date(timestamp).getUTCHours();
+    const peak=(hour>=1&&hour<4)||(hour>=6&&hour<10);
+    return {id,period:peak?'peak':'off-peak',historical:false,weekend:false,...DEEPSEEK_V4_RATES[id][peak?'peak':'offPeak']};
+  }
+  function deepSeekPricingForUsage(g){
+    const id=deepSeekModelId(g.model);
+    if(!id) return null;
+    if(Number.isFinite(Number(g.messageTimestamp))) return deepSeekPricingAt(id,Number(g.messageTimestamp));
+    return deepSeekPricingAt(id);
+  }
+  function effectivePreset(p,now=Date.now()){
+    if(!p?.dynamicPricing) return p;
+    const dynamic=deepSeekPricingAt(p.id,now);
+    return dynamic?{...p,...dynamic}:p;
   }
   function presetIsActive(p,now=Date.now()){
     return (!p.activeFrom||now>=Date.parse(p.activeFrom))&&(!p.activeUntil||now<Date.parse(p.activeUntil));
@@ -218,13 +368,15 @@
   }
   function compute(g,p){
     const raw=num(g.tokensPrompt), read=num(g.tokensCachedPrompt), write=num(g.tokensCacheWritePrompt), out=num(g.tokensCompletion);
+    const deepSeekPricing=deepSeekPricingForUsage(g);
+    const effective=deepSeekPricing?{...p,...deepSeekPricing,adjustment:'subtract-read'}:p;
     let ordinary=raw;
-    if(p.adjustment==='subtract-read') ordinary=Math.max(0,raw-read);
-    if(p.adjustment==='subtract-both') ordinary=Math.max(0,raw-read-write);
+    if(effective.adjustment==='subtract-read') ordinary=Math.max(0,raw-read);
+    if(effective.adjustment==='subtract-both') ordinary=Math.max(0,raw-read-write);
     const tier=tierFor(g,raw), factor=tier||{input:1,read:1,write:1,output:1};
-    const rates={input:num(p.input)*factor.input,read:num(p.read)*factor.read,write:num(p.write)*factor.write,output:num(p.output)*factor.output};
+    const rates={input:num(effective.input)*factor.input,read:num(effective.read)*factor.read,write:num(effective.write)*factor.write,output:num(effective.output)*factor.output};
     const parts={input:ordinary*rates.input/1e6,read:read*rates.read/1e6,write:write*rates.write/1e6,output:out*rates.output/1e6};
-    return {raw,ordinary,read,write,out,rates,tier,parts,total:Object.values(parts).reduce((a,b)=>a+b,0)};
+    return {raw,ordinary,read,write,out,rates,tier,deepSeekPricing,parts,total:Object.values(parts).reduce((a,b)=>a+b,0)};
   }
   async function saveProfile(g){
     const key=`${g.provider||''}::${g.model||''}`; const q=n=>num(root.querySelector(`[name=${n}]`).value);
@@ -258,6 +410,7 @@
       <div class="tr-row tr-usage"><span>출력 (추론 포함)</span><span class="tr-tokens">${c.out.toLocaleString()} tok</span><b>${money(c.parts.output)}</b></div>
       <div class="tr-row tr-total"><span>턴 합계</span><span>${money(c.total)}</span></div>
       ${c.tier?`<div class="tr-tier">장문 요금 적용: 입력 ${c.raw.toLocaleString()} &gt; ${c.tier.threshold.toLocaleString()}토큰</div>`:''}
+      ${c.deepSeekPricing?`<div class="tr-tier">${c.deepSeekPricing.period==='legacy'?'DeepSeek 인상 전 요금 적용 · 2026-08-17 00:00 BJT 이전':c.deepSeekPricing.weekend?'DeepSeek 오프피크 요금 적용 · 베이징 주말':`DeepSeek ${c.deepSeekPricing.period==='peak'?'피크':'오프피크'} 요금 적용 · KST ${c.deepSeekPricing.period==='peak'?'10:00–13:00 / 15:00–19:00':'그 외 시간'}`}</div>`:''}
       ${String(cfg.currency).toUpperCase()==='USD'?`<div class="tr-row"><span>현재 환율 원화 예상액</span><b>${won(c.total)}</b></div><div class="tr-muted">USD 1 = ₩${num(cfg.fx?.rate).toLocaleString('ko-KR')} · 기준 ${esc(cfg.fx?.marketDate||'')} · 갱신 ${esc(fxTime())}</div>${cfg.fx?.error?`<div class="tr-warn">환율 갱신 실패: ${esc(cfg.fx.error)}</div>`:''}`:''}
       ${configured?'':'<div class="tr-warn">단가가 0입니다. 아래에서 공급자 가격표를 입력하세요.</div>'}
       <div class="tr-muted">기록된 input: ${c.raw.toLocaleString()} · 메시지 ${esc(m.id||'')}</div>
@@ -272,7 +425,7 @@
       for(const element of body.querySelectorAll('[data-field^=cache-ttl]')) element.hidden=!visible;
     };
     const syncPresetWrite=()=>{
-      const preset=selectedPreset();
+      const preset=effectivePreset(selectedPreset());
       if(!preset) return;
       body.querySelector('[name=write]').value=String(body.querySelector('[name=cacheTtl]').value==='1h'&&preset.write1h!=null?preset.write1h:preset.write);
     };
@@ -282,7 +435,7 @@
     });
     syncCacheTtlVisibility();
     body.querySelector('[data-act=load-preset]').addEventListener('click',()=>{
-      const preset=selectedPreset();
+      const preset=effectivePreset(selectedPreset());
       if(!preset) return;
       for(const field of ['input','read','output']) body.querySelector(`[name=${field}]`).value=String(preset[field]);
       syncPresetWrite();
@@ -372,6 +525,12 @@
         showError(isConversation?'대화모드 Peek Prompt 조회가 꺼져 있습니다.':'화면에서 모델·토큰 정보를 찾지 못했습니다.',isConversation?'설정에서 대화모드 Peek Prompt를 켜 주세요.':'Marinara의 모델명·토큰 사용량 표시를 켜거나 RP Peek Prompt 보완을 허용해 주세요.');
         return;
       }
+      await createdAtForMessage(messageElement,true);
+      const messageTime=messagePricingTime(messageElement);
+      if(messageTime){
+        if(Number.isFinite(Number(messageTime.timestamp))) usage.messageTimestamp=messageTime.timestamp;
+        usage.messageTimestampSource=messageTime.source;
+      }
       lastReceipt={message:{id:messageId},usage,source};
       render(lastReceipt.message,usage,source);
       requestAnimationFrame(placePanel);
@@ -405,6 +564,7 @@
     const owner=node.matches('.mari-message-actions')?node.closest('[data-message-id]'):null;
     if(owner) decorateMessage(owner);
     for(const message of node.querySelectorAll('[data-message-id]')) decorateMessage(message);
+    scheduleMetadataSync();
   }
   const observer=new MutationObserver(records=>{
     for(const record of records){
@@ -416,7 +576,7 @@
     }
   });
   observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['aria-hidden']});
-  marinara.onCleanup(()=>{observer.disconnect();activeRequest?.abort();document.querySelectorAll(`.${MESSAGE_BUTTON}`).forEach(button=>button.remove())});
+  marinara.onCleanup(()=>{observer.disconnect();activeRequest?.abort();if(metadataSyncTimer)clearTimeout(metadataSyncTimer);document.querySelectorAll(`.${MESSAGE_BUTTON}`).forEach(button=>button.remove())});
   on(root.querySelector('[data-act=close]'),'click',closePanel);
   on(root.querySelector('[data-act=help]'),'click',()=>{
     if(panelView==='help') renderReceiptOrIdle();
