@@ -1,5 +1,13 @@
 # Token Cost Receipt for Marinara Engine 2.4.1
 
+## v3.0.6 변경 사항
+
+- 모델 단가 프리셋에 GPT 6.0, Gemini 3.8 Flash, DeepSeek 4.1 Flash, GLM-5.3을 추가했습니다.
+- Claude Sonnet 5의 날짜 구분을 제거하고 현재 영구 요금으로 정리했습니다. DeepSeek V4 Flash 프리셋은 목록에서 제거하고 DeepSeek V4 Pro 프리셋은 유지합니다.
+- 과거 DeepSeek V4 메시지의 역사적 요금 계산 로직은 유지합니다.
+- DeepSeek 4.1 Flash의 피크/오프피크 및 주말 할인 요금을 반영합니다.
+
+
 각 AI 메시지의 하단 도구줄에 영수증 아이콘을 추가하고, 선택한 메시지 한 건의 예상 비용을 표시합니다.
 
 ## v3.0.5 변경 사항

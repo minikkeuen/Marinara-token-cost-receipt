@@ -73,6 +73,7 @@
   const FX_TTL = 6 * 60 * 60 * 1000;
   const PRESET_GROUPS = [
     { label:'OpenAI', items:[
+      {id:'gpt-6-astra',modelId:'gpt-6-astra',label:'GPT 6.0',input:10,read:1,write:12.5,output:50,adjustment:'subtract-both'},
       {id:'gpt-5.6-terra',label:'GPT-5.6 Terra',input:2.5,read:.25,write:0,output:15,adjustment:'subtract-read'},
       {id:'gpt-5.6-sol',label:'GPT-5.6 Sol',input:5,read:.5,write:0,output:30,adjustment:'subtract-read'},
       {id:'gpt-5.6-luna',label:'GPT-5.6 Luna',input:1,read:.1,write:0,output:6,adjustment:'subtract-read'},
@@ -84,14 +85,15 @@
     { label:'Anthropic', items:[
       {id:'claude-fable-5',label:'Claude Fable 5',input:10,read:1,write:12.5,write1h:20,output:50,adjustment:'none'},
       {id:'claude-opus-5',label:'Claude Opus 5',input:5,read:.5,write:6.25,write1h:10,output:25,adjustment:'none'},
-      {id:'claude-sonnet-5-until-2026-08-31',modelId:'claude-sonnet-5',label:'Claude Sonnet 5 (2026-08-31까지)',input:2,read:.2,write:2.5,write1h:4,output:10,adjustment:'none',activeUntil:'2026-09-01T00:00:00Z'},
-      {id:'claude-sonnet-5-from-2026-09-01',modelId:'claude-sonnet-5',label:'Claude Sonnet 5 (2026-09-01부터)',input:3,read:.3,write:3.75,write1h:6,output:15,adjustment:'none',activeFrom:'2026-09-01T00:00:00Z'},
+      {id:'claude-sonnet-5-until-2026-08-31',modelId:'claude-sonnet-5',label:'Claude Sonnet 5',input:2,read:.2,write:2.5,write1h:4,output:10,adjustment:'none',activeUntil:'2026-09-01T00:00:00Z'},
+      {id:'claude-sonnet-5',modelId:'claude-sonnet-5',label:'Claude Sonnet 5',input:2,read:.2,write:2.5,write1h:4,output:10,adjustment:'none',activeFrom:'2026-09-01T00:00:00Z'},
       {id:'claude-opus-4-8',label:'Claude Opus 4.8',input:5,read:.5,write:6.25,write1h:10,output:25,adjustment:'none'},
       {id:'claude-opus-4-7',label:'Claude Opus 4.7',input:5,read:.5,write:6.25,write1h:10,output:25,adjustment:'none'},
       {id:'claude-opus-4-6',label:'Claude Opus 4.6',input:5,read:.5,write:6.25,write1h:10,output:25,adjustment:'none'},
       {id:'claude-sonnet-4-6',label:'Claude Sonnet 4.6',input:3,read:.3,write:3.75,write1h:6,output:15,adjustment:'none'},
     ]},
     { label:'Google Gemini', items:[
+      {id:'gemini-3.8-flash',label:'Gemini 3.8 Flash',input:.75,read:.075,write:0,output:3.75,adjustment:'none'},
       {id:'gemini-3.7-flash',label:'Gemini 3.7 Flash',input:.75,read:.075,write:0,output:3.75,adjustment:'none'},
       {id:'gemini-3.6-flash',label:'Gemini 3.6 Flash',input:1.5,read:.15,write:0,output:7.5,adjustment:'none'},
       {id:'gemini-3.5-flash',label:'Gemini 3.5 Flash',input:1.5,read:.15,write:0,output:9,adjustment:'none'},
@@ -99,10 +101,11 @@
       {id:'gemini-3.1-flash-lite',label:'Gemini 3.1 Flash-Lite',input:.25,read:.025,write:0,output:1.5,adjustment:'none'},
     ]},
     { label:'DeepSeek', items:[
+      {id:'deepseek-v4.1-flash',label:'DeepSeek 4.1 Flash',input:.15,read:.003,write:0,output:.6,adjustment:'subtract-read',dynamicPricing:'deepseek-v4.1'},
       {id:'deepseek-v4-pro',label:'DeepSeek V4 Pro',input:.66,read:.022,write:0,output:1.98,adjustment:'subtract-read',dynamicPricing:'deepseek-v4'},
-      {id:'deepseek-v4-flash',label:'DeepSeek V4 Flash',input:.22,read:.007,write:0,output:.66,adjustment:'subtract-read',dynamicPricing:'deepseek-v4'},
     ]},
     { label:'GLM', items:[
+      {id:'glm-5.3',label:'GLM-5.3',input:1.4,read:.26,write:0,output:4.4,adjustment:'none'},
       {id:'glm-5.2',label:'GLM-5.2',input:1.4,read:.26,write:0,output:4.4,adjustment:'none'},
       {id:'glm-5.1',label:'GLM-5.1',input:1.4,read:.26,write:0,output:4.4,adjustment:'none'},
     ]},
@@ -113,6 +116,7 @@
   ];
   const PRESETS = PRESET_GROUPS.flatMap(group=>group.items);
   const DEEPSEEK_V4_RATES = {
+    'deepseek-v4.1-flash': {offPeak:{input:.15,read:.003,write:0,output:.6},peak:{input:.30,read:.006,write:0,output:1.2}},
     'deepseek-v4-flash': {offPeak:{input:.22,read:.007,write:0,output:.66},peak:{input:.44,read:.014,write:0,output:1.32}},
     'deepseek-v4-pro': {offPeak:{input:.66,read:.022,write:0,output:1.98},peak:{input:1.32,read:.044,write:0,output:3.96}},
   };
@@ -301,6 +305,7 @@
   }
   function deepSeekModelId(value){
     const model=String(value||'').toLowerCase().replace(/^deepseek\//,'');
+    if(/^deepseek-v4[.-]1-flash(?:-|$)/.test(model)||/^deepseek-v4\.1-flash(?:-|$)/.test(model)) return 'deepseek-v4.1-flash';
     if(/^deepseek-v4-flash(?:-|$)/.test(model)) return 'deepseek-v4-flash';
     if(/^deepseek-v4-pro(?:-|$)/.test(model)) return 'deepseek-v4-pro';
     return null;
@@ -315,7 +320,7 @@
     if(!id) return null;
     const timestamp=Number(now);
     if(!Number.isFinite(timestamp)) return null;
-    if(timestamp<DEEPSEEK_V4_TIER_START){
+    if(id!=='deepseek-v4.1-flash'&&timestamp<DEEPSEEK_V4_TIER_START){
       return {id,period:'legacy',historical:true,weekend:false,...DEEPSEEK_V4_LEGACY_RATES[id]};
     }
     if(timestamp>=DEEPSEEK_WEEKEND_RULE_START&&isDeepSeekWeekendBeijing(timestamp)){
@@ -343,6 +348,7 @@
     const model=String(g.model||'').toLowerCase().replace(/^(?:openai|anthropic|google)\//,'');
     const exact=PRESETS.find(p=>model===(p.modelId||p.id)&&presetIsActive(p));
     if(exact) return exact;
+    if(/^gpt-6(?:\.0)?(?:-astra)?(?:-|$)/.test(model)) return PRESETS.find(p=>p.id==='gpt-6-astra')||null;
     if(/^gpt-5\.6(?:-\d|$)/.test(model)) return PRESETS.find(p=>p.id==='gpt-5.6-sol')||null;
     if(/^gemini-3\.1-pro(?:-|$)/.test(model)) return PRESETS.find(p=>p.id==='gemini-3.1-pro-preview')||null;
     return [...PRESETS].sort((a,b)=>(b.modelId||b.id).length-(a.modelId||a.id).length).find(p=>{
@@ -357,6 +363,10 @@
     const provider=String(g.provider||'').toLowerCase(), model=String(g.model||'').toLowerCase().replace(/^openai\//,'');
     if(provider==='google'&&/^gemini-3\.1-pro(?:-preview)?(?:-|$)/.test(model)&&raw>200000){
       return {threshold:200000,input:2,read:2,write:1,output:1.5};
+    }
+    const gpt6=/^gpt-6(?:\.0)?(?:-astra)?(?:-|$)/.test(model);
+    if(provider==='openai'&&gpt6&&raw>272000){
+      return {threshold:272000,input:2,read:2,write:2,output:1.5};
     }
     const gpt54=/^gpt-5\.4(?:-\d|$)/.test(model);
     const gpt55=/^gpt-5\.5(?:-\d|$)/.test(model);
@@ -402,7 +412,7 @@
     setPanelView('receipt');
     const p=profileFor(g), c=compute(g,p), configured=[p.input,p.read,p.write,p.output].some(x=>num(x)>0);
     const suggested=currentPreset(g);
-    const presetOptions=PRESET_GROUPS.map(group=>`<optgroup label="${esc(group.label)}">${group.items.map(item=>`<option value="${esc(item.id)}" ${suggested?.id===item.id?'selected':''}>${esc(item.label)}${suggested?.id===item.id?' (현재 모델)':''}</option>`).join('')}</optgroup>`).join('');
+    const presetOptions=PRESET_GROUPS.map(group=>`<optgroup label="${esc(group.label)}">${group.items.filter(item=>presetIsActive(item)).map(item=>`<option value="${esc(item.id)}" ${suggested?.id===item.id?'selected':''}>${esc(item.label)}${suggested?.id===item.id?' (현재 모델)':''}</option>`).join('')}</optgroup>`).join('');
     body.innerHTML=`<div class="tr-title">${esc(g.provider||'unknown')} · ${esc(g.model||'unknown model')}</div>
       <div class="tr-row tr-usage"><span>일반 입력</span><span class="tr-tokens">${c.ordinary.toLocaleString()} tok</span><b>${money(c.parts.input)}</b></div>
       <div class="tr-row tr-usage"><span>캐시 읽기(hit)</span><span class="tr-tokens">${c.read.toLocaleString()} tok</span><b>${money(c.parts.read)}</b></div>
