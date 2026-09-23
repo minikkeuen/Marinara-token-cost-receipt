@@ -73,47 +73,47 @@
   const FX_TTL = 6 * 60 * 60 * 1000;
   const PRESET_GROUPS = [
     { label:'OpenAI', items:[
-      {id:'gpt-6-astra',modelId:'gpt-6-astra',label:'GPT 6.0',input:10,read:1,write:12.5,output:50,adjustment:'subtract-both'},
-      {id:'gpt-6-sol',modelId:'gpt-6-sol',label:'GPT-6 Sol',input:2,read:.2,write:2.5,output:10,adjustment:'subtract-both'},
-      {id:'gpt-5.6-terra',label:'GPT-5.6 Terra',input:2.5,read:.25,write:0,output:15,adjustment:'subtract-read'},
-      {id:'gpt-5.6-sol',label:'GPT-5.6 Sol',input:5,read:.5,write:0,output:30,adjustment:'subtract-read'},
-      {id:'gpt-5.6-luna',label:'GPT-5.6 Luna',input:1,read:.1,write:0,output:6,adjustment:'subtract-read'},
-      {id:'gpt-5.5',label:'GPT-5.5',input:5,read:.5,write:0,output:30,adjustment:'subtract-read'},
-      {id:'gpt-5.4',label:'GPT-5.4',input:2.5,read:.25,write:0,output:15,adjustment:'subtract-read'},
-      {id:'gpt-5.4-mini',label:'GPT-5.4 mini',input:.75,read:.075,write:0,output:4.5,adjustment:'subtract-read'},
-      {id:'gpt-5.4-nano',label:'GPT-5.4 nano',input:.2,read:.02,write:0,output:1.25,adjustment:'subtract-read'},
+      {id:'gpt-6-astra',modelId:'gpt-6-astra',label:'GPT 6.0',input:10,read:1,write:12.5,output:50,adjustment:'subtract-both',currency:'USD'},
+      {id:'gpt-6-sol',modelId:'gpt-6-sol',label:'GPT-6 Sol',input:2,read:.2,write:2.5,output:10,adjustment:'subtract-both',currency:'USD'},
+      {id:'gpt-5.6-terra',label:'GPT-5.6 Terra',input:2.5,read:.25,write:0,output:15,adjustment:'subtract-read',currency:'USD'},
+      {id:'gpt-5.6-sol',label:'GPT-5.6 Sol',input:5,read:.5,write:0,output:30,adjustment:'subtract-read',currency:'USD'},
+      {id:'gpt-5.6-luna',label:'GPT-5.6 Luna',input:1,read:.1,write:0,output:6,adjustment:'subtract-read',currency:'USD'},
+      {id:'gpt-5.5',label:'GPT-5.5',input:5,read:.5,write:0,output:30,adjustment:'subtract-read',currency:'USD'},
+      {id:'gpt-5.4',label:'GPT-5.4',input:2.5,read:.25,write:0,output:15,adjustment:'subtract-read',currency:'USD'},
+      {id:'gpt-5.4-mini',label:'GPT-5.4 mini',input:.75,read:.075,write:0,output:4.5,adjustment:'subtract-read',currency:'USD'},
+      {id:'gpt-5.4-nano',label:'GPT-5.4 nano',input:.2,read:.02,write:0,output:1.25,adjustment:'subtract-read',currency:'USD'},
     ]},
     { label:'Anthropic', items:[
-      {id:'claude-fable-5',label:'Claude Fable 5',input:10,read:1,write:12.5,write1h:20,output:50,adjustment:'none'},
-      {id:'claude-opus-5-5',modelId:'claude-opus-5-5',label:'Claude Opus 5.5',input:4,read:.2,write:5,write1h:8,output:20,adjustment:'none'},
-      {id:'claude-opus-5',label:'Claude Opus 5',input:5,read:.5,write:6.25,write1h:10,output:25,adjustment:'none'},
-      {id:'claude-sonnet-5-until-2026-08-31',modelId:'claude-sonnet-5',label:'Claude Sonnet 5',input:2,read:.2,write:2.5,write1h:4,output:10,adjustment:'none',activeUntil:'2026-09-01T00:00:00Z'},
-      {id:'claude-sonnet-5',modelId:'claude-sonnet-5',label:'Claude Sonnet 5',input:2,read:.2,write:2.5,write1h:4,output:10,adjustment:'none',activeFrom:'2026-09-01T00:00:00Z'},
-      {id:'claude-opus-4-8',label:'Claude Opus 4.8',input:5,read:.5,write:6.25,write1h:10,output:25,adjustment:'none'},
-      {id:'claude-opus-4-7',label:'Claude Opus 4.7',input:5,read:.5,write:6.25,write1h:10,output:25,adjustment:'none'},
-      {id:'claude-opus-4-6',label:'Claude Opus 4.6',input:5,read:.5,write:6.25,write1h:10,output:25,adjustment:'none'},
-      {id:'claude-sonnet-4-6',label:'Claude Sonnet 4.6',input:3,read:.3,write:3.75,write1h:6,output:15,adjustment:'none'},
+      {id:'claude-fable-5',label:'Claude Fable 5',input:10,read:1,write:12.5,write1h:20,output:50,adjustment:'none',currency:'USD'},
+      {id:'claude-opus-5-5',modelId:'claude-opus-5-5',label:'Claude Opus 5.5',input:4,read:.2,write:5,write1h:8,output:20,adjustment:'none',currency:'USD'},
+      {id:'claude-opus-5',label:'Claude Opus 5',input:5,read:.5,write:6.25,write1h:10,output:25,adjustment:'none',currency:'USD'},
+      {id:'claude-sonnet-5-until-2026-08-31',modelId:'claude-sonnet-5',label:'Claude Sonnet 5',input:2,read:.2,write:2.5,write1h:4,output:10,adjustment:'none',activeUntil:'2026-09-01T00:00:00Z',currency:'USD'},
+      {id:'claude-sonnet-5',modelId:'claude-sonnet-5',label:'Claude Sonnet 5',input:2,read:.2,write:2.5,write1h:4,output:10,adjustment:'none',activeFrom:'2026-09-01T00:00:00Z',currency:'USD'},
+      {id:'claude-opus-4-8',label:'Claude Opus 4.8',input:5,read:.5,write:6.25,write1h:10,output:25,adjustment:'none',currency:'USD'},
+      {id:'claude-opus-4-7',label:'Claude Opus 4.7',input:5,read:.5,write:6.25,write1h:10,output:25,adjustment:'none',currency:'USD'},
+      {id:'claude-opus-4-6',label:'Claude Opus 4.6',input:5,read:.5,write:6.25,write1h:10,output:25,adjustment:'none',currency:'USD'},
+      {id:'claude-sonnet-4-6',label:'Claude Sonnet 4.6',input:3,read:.3,write:3.75,write1h:6,output:15,adjustment:'none',currency:'USD'},
     ]},
     { label:'Google Gemini', items:[
-      {id:'gemini-3.8-flash',label:'Gemini 3.8 Flash',input:.75,read:.075,write:0,output:3.75,adjustment:'none'},
-      {id:'gemini-3.7-flash',label:'Gemini 3.7 Flash',input:.75,read:.075,write:0,output:3.75,adjustment:'none'},
-      {id:'gemini-3.6-flash',label:'Gemini 3.6 Flash',input:1.5,read:.15,write:0,output:7.5,adjustment:'none'},
-      {id:'gemini-3.5-flash',label:'Gemini 3.5 Flash',input:1.5,read:.15,write:0,output:9,adjustment:'none'},
-      {id:'gemini-3.1-pro-preview',label:'Gemini 3.1 Pro Preview',input:2,read:.2,write:0,output:12,adjustment:'none'},
-      {id:'gemini-3.1-flash-lite',label:'Gemini 3.1 Flash-Lite',input:.25,read:.025,write:0,output:1.5,adjustment:'none'},
+      {id:'gemini-3.8-flash',label:'Gemini 3.8 Flash',input:.75,read:.075,write:0,output:3.75,adjustment:'none',currency:'USD'},
+      {id:'gemini-3.7-flash',label:'Gemini 3.7 Flash',input:.75,read:.075,write:0,output:3.75,adjustment:'none',currency:'USD'},
+      {id:'gemini-3.6-flash',label:'Gemini 3.6 Flash',input:1.5,read:.15,write:0,output:7.5,adjustment:'none',currency:'USD'},
+      {id:'gemini-3.5-flash',label:'Gemini 3.5 Flash',input:1.5,read:.15,write:0,output:9,adjustment:'none',currency:'USD'},
+      {id:'gemini-3.1-pro-preview',label:'Gemini 3.1 Pro Preview',input:2,read:.2,write:0,output:12,adjustment:'none',currency:'USD'},
+      {id:'gemini-3.1-flash-lite',label:'Gemini 3.1 Flash-Lite',input:.25,read:.025,write:0,output:1.5,adjustment:'none',currency:'USD'},
     ]},
     { label:'DeepSeek', items:[
-      {id:'deepseek-v4.1-flash',label:'DeepSeek 4.1 Flash',input:.15,read:.003,write:0,output:.6,adjustment:'subtract-read',dynamicPricing:'deepseek-v4.1'},
-      {id:'deepseek-v4-pro',label:'DeepSeek V4 Pro',input:.66,read:.022,write:0,output:1.98,adjustment:'subtract-read',dynamicPricing:'deepseek-v4'},
+      {id:'deepseek-v4.1-flash',label:'DeepSeek 4.1 Flash',input:.15,read:.003,write:0,output:.6,adjustment:'subtract-read',dynamicPricing:'deepseek-v4.1',currency:'USD'},
+      {id:'deepseek-v4-pro',label:'DeepSeek V4 Pro',input:.66,read:.022,write:0,output:1.98,adjustment:'subtract-read',dynamicPricing:'deepseek-v4',currency:'USD'},
     ]},
     { label:'GLM', items:[
-      {id:'glm-5.3',label:'GLM-5.3',input:1.4,read:.26,write:0,output:4.4,adjustment:'none'},
-      {id:'glm-5.2',label:'GLM-5.2',input:1.4,read:.26,write:0,output:4.4,adjustment:'none'},
-      {id:'glm-5.1',label:'GLM-5.1',input:1.4,read:.26,write:0,output:4.4,adjustment:'none'},
+      {id:'glm-5.3',label:'GLM-5.3',input:1.4,read:.26,write:0,output:4.4,adjustment:'none',currency:'USD'},
+      {id:'glm-5.2',label:'GLM-5.2',input:1.4,read:.26,write:0,output:4.4,adjustment:'none',currency:'USD'},
+      {id:'glm-5.1',label:'GLM-5.1',input:1.4,read:.26,write:0,output:4.4,adjustment:'none',currency:'USD'},
     ]},
     { label:'Kimi', items:[
-      {id:'kimi-k3',label:'Kimi K3',input:3,read:.3,write:0,output:15,adjustment:'none'},
-      {id:'kimi-k2.6',label:'Kimi K2.6',input:.95,read:.16,write:0,output:4,adjustment:'none'},
+      {id:'kimi-k3',label:'Kimi K3',input:3,read:.3,write:0,output:15,adjustment:'none',currency:'USD'},
+      {id:'kimi-k2.6',label:'Kimi K2.6',input:.95,read:.16,write:0,output:4,adjustment:'none',currency:'USD'},
     ]},
   ];
   const PRESETS = PRESET_GROUPS.flatMap(group=>group.items);
@@ -135,29 +135,38 @@
   let metadataSyncTimer = 0;
   const num = v => Number.isFinite(Number(v)) ? Number(v) : 0;
   const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const money = v => `${cfg.currency} ${v < .01 ? v.toFixed(6) : v.toFixed(4)}`;
-  const fxCurrency = () => String(cfg.currency||'USD').toUpperCase();
-  const supportsFx = () => ['USD','CNY'].includes(fxCurrency());
-  const won = v => { const rate=num(cfg.fx?.rate), krw=v*rate; if(!rate) return '환율 없음'; return `약 ₩${krw.toLocaleString('ko-KR',{minimumFractionDigits:krw<1?4:krw<100?2:0,maximumFractionDigits:krw<1?4:krw<100?2:0})}`; };
-  const fxTime = () => cfg.fx?.updatedAt ? new Date(cfg.fx.updatedAt).toLocaleString('ko-KR') : '아직 갱신 안 됨';
-  async function updateFx(force=false){
-    const currency=fxCurrency();
-    if(!supportsFx()) return;
-    const fresh=cfg.fx?.base===currency&&cfg.fx?.rate&&Date.now()-num(cfg.fx.updatedAt)<FX_TTL;
+  const profileCurrency = p => String(p?.currency||cfg.currency||'USD').toUpperCase();
+  const money = (v,currency=cfg.currency) => `${String(currency||'USD').toUpperCase()} ${v < .01 ? v.toFixed(6) : v.toFixed(4)}`;
+  const supportsFx = currency => ['USD','CNY'].includes(String(currency||'').toUpperCase());
+  const fxFor = currency => { const c=String(currency||'USD').toUpperCase(); return cfg.fxRates?.[c] || (cfg.fx?.base===c?cfg.fx:null); };
+  const won = (v,currency) => { const rate=num(fxFor(currency)?.rate), krw=v*rate; if(!rate) return '환율 없음'; return `약 ₩${krw.toLocaleString('ko-KR',{minimumFractionDigits:krw<1?4:krw<100?2:0,maximumFractionDigits:krw<1?4:krw<100?2:0})}`; };
+  const fxTime = currency => { const fx=fxFor(currency); return fx?.updatedAt ? new Date(fx.updatedAt).toLocaleString('ko-KR') : '아직 갱신 안 됨'; };
+  async function updateFx(currency,force=false){
+    currency=String(currency||cfg.currency||'USD').toUpperCase();
+    if(!supportsFx(currency)) return;
+    const current=fxFor(currency);
+    const fresh=current?.rate&&Date.now()-num(current.updatedAt)<FX_TTL;
     if(fresh&&!force) return;
     try{
       const res=await fetch(`https://api.frankfurter.dev/v1/latest?from=${encodeURIComponent(currency)}&to=KRW`,{cache:'no-store'});
       if(!res.ok) throw new Error(`HTTP ${res.status}`);
       const data=await res.json(), rate=num(data?.rates?.KRW);
       if(!rate) throw new Error('KRW 환율 누락');
-      cfg.fx={base:currency,rate,updatedAt:Date.now(),marketDate:data.date||null,source:'Frankfurter',error:null};
+      const next={base:currency,rate,updatedAt:Date.now(),marketDate:data.date||null,source:'Frankfurter',error:null};
+      cfg.fxRates={...(cfg.fxRates||{}),[currency]:next};
+      cfg.fx=next;
     }catch(e){
-      const sameBase=cfg.fx?.base===currency;
-      cfg.fx={...(sameBase?cfg.fx:{}),base:currency,rate:sameBase?num(cfg.fx?.rate):0,source:'Frankfurter',error:String(e?.message||e),lastAttemptAt:Date.now()};
+      const previous=fxFor(currency);
+      const next={...(previous||{}),base:currency,rate:num(previous?.rate),source:'Frankfurter',error:String(e?.message||e),lastAttemptAt:Date.now()};
+      cfg.fxRates={...(cfg.fxRates||{}),[currency]:next};
+      cfg.fx=next;
     }
     await storage.patch({config:cfg}).catch(()=>{});
     if(panelView==='settings') renderSettings();
     else if(lastReceipt) render(lastReceipt.message,lastReceipt.usage,lastReceipt.source);
+  }
+  async function updateAllFx(force=false){
+    for(const currency of ['USD','CNY']) await updateFx(currency,force);
   }
   function activeSidebarChatId(){
     for(const row of document.querySelectorAll('[data-chat-id]')){
@@ -307,7 +316,7 @@
   function profileFor(g){
     const key=`${g.provider||''}::${g.model||''}`;
     const byModel=Object.entries(cfg.profiles||{}).find(([savedKey])=>savedKey.endsWith(`::${g.model||''}`))?.[1];
-    return { key, ...(cfg.profiles[key]||byModel||cfg) };
+    return { key, ...cfg, ...(cfg.profiles[key]||byModel||{}) };
   }
   function deepSeekModelId(value){
     const model=String(value||'').toLowerCase().replace(/^deepseek\//,'');
@@ -396,9 +405,10 @@
   }
   async function saveProfile(g){
     const key=`${g.provider||''}::${g.model||''}`; const q=n=>num(root.querySelector(`[name=${n}]`).value);
-    cfg.currency=root.querySelector('[name=currency]').value.trim()||'USD';
-    cfg.profiles={...(cfg.profiles||{}),[key]:{input:q('input'),read:q('read'),write:q('write'),output:q('output'),adjustment:root.querySelector('[name=adjustment]').value,cacheTtl:root.querySelector('[name=cacheTtl]').value}};
+    const currency=root.querySelector('[name=currency]').value.trim().toUpperCase()||'USD';
+    cfg.profiles={...(cfg.profiles||{}),[key]:{input:q('input'),read:q('read'),write:q('write'),output:q('output'),currency,adjustment:root.querySelector('[name=adjustment]').value,cacheTtl:root.querySelector('[name=cacheTtl]').value}};
     await storage.patch({config:cfg});
+    await updateFx(currency,false);
     if(lastReceipt) render(lastReceipt.message,lastReceipt.usage,lastReceipt.source);
   }
   function setPanelView(view){
@@ -416,25 +426,25 @@
   }
   function render(m,g,source){
     setPanelView('receipt');
-    const p=profileFor(g), c=compute(g,p), configured=[p.input,p.read,p.write,p.output].some(x=>num(x)>0);
+    const p=profileFor(g), currency=profileCurrency(p), fx=fxFor(currency), c=compute(g,p), configured=[p.input,p.read,p.write,p.output].some(x=>num(x)>0);
     const suggested=currentPreset(g);
     const presetOptions=PRESET_GROUPS.map(group=>`<optgroup label="${esc(group.label)}">${group.items.filter(item=>presetIsActive(item)).map(item=>`<option value="${esc(item.id)}" ${suggested?.id===item.id?'selected':''}>${esc(item.label)}${suggested?.id===item.id?' (현재 모델)':''}</option>`).join('')}</optgroup>`).join('');
     body.innerHTML=`<div class="tr-title">${esc(g.provider||'unknown')} · ${esc(g.model||'unknown model')}</div>
-      <div class="tr-row tr-usage"><span>일반 입력</span><span class="tr-tokens">${c.ordinary.toLocaleString()} tok</span><b>${money(c.parts.input)}</b></div>
-      <div class="tr-row tr-usage"><span>캐시 읽기(hit)</span><span class="tr-tokens">${c.read.toLocaleString()} tok</span><b>${money(c.parts.read)}</b></div>
-      <div class="tr-row tr-usage"><span>캐시 쓰기(created)${String(g.provider||'').toLowerCase()==='anthropic'||String(g.model||'').toLowerCase().includes('claude-')?` · ${p.cacheTtl==='1h'?'1h':'5m'}`:''}</span><span class="tr-tokens">${c.write.toLocaleString()} tok</span><b>${money(c.parts.write)}</b></div>
-      <div class="tr-row tr-usage"><span>출력 (추론 포함)</span><span class="tr-tokens">${c.out.toLocaleString()} tok</span><b>${money(c.parts.output)}</b></div>
-      <div class="tr-row tr-total"><span>턴 합계</span><span>${money(c.total)}</span></div>
+      <div class="tr-row tr-usage"><span>일반 입력</span><span class="tr-tokens">${c.ordinary.toLocaleString()} tok</span><b>${money(c.parts.input,currency)}</b></div>
+      <div class="tr-row tr-usage"><span>캐시 읽기(hit)</span><span class="tr-tokens">${c.read.toLocaleString()} tok</span><b>${money(c.parts.read,currency)}</b></div>
+      <div class="tr-row tr-usage"><span>캐시 쓰기(created)${String(g.provider||'').toLowerCase()==='anthropic'||String(g.model||'').toLowerCase().includes('claude-')?` · ${p.cacheTtl==='1h'?'1h':'5m'}`:''}</span><span class="tr-tokens">${c.write.toLocaleString()} tok</span><b>${money(c.parts.write,currency)}</b></div>
+      <div class="tr-row tr-usage"><span>출력 (추론 포함)</span><span class="tr-tokens">${c.out.toLocaleString()} tok</span><b>${money(c.parts.output,currency)}</b></div>
+      <div class="tr-row tr-total"><span>턴 합계</span><span>${money(c.total,currency)}</span></div>
       ${c.tier?`<div class="tr-tier">장문 요금 적용: 입력 ${c.raw.toLocaleString()} &gt; ${c.tier.threshold.toLocaleString()}토큰</div>`:''}
       ${c.deepSeekPricing?`<div class="tr-tier">${c.deepSeekPricing.period==='legacy'?'DeepSeek 인상 전 요금 적용 · 2026-08-17 00:00 BJT 이전':c.deepSeekPricing.weekend?'DeepSeek 오프피크 요금 적용 · 베이징 주말':`DeepSeek ${c.deepSeekPricing.period==='peak'?'피크':'오프피크'} 요금 적용 · KST ${c.deepSeekPricing.period==='peak'?'10:00–13:00 / 15:00–19:00':'그 외 시간'}`}</div>`:''}
-      ${supportsFx()?`<div class="tr-row"><span>현재 환율 원화 예상액</span><b>${won(c.total)}</b></div><div class="tr-muted">${esc(fxCurrency())} 1 = ₩${num(cfg.fx?.rate).toLocaleString('ko-KR')} · 기준 ${esc(cfg.fx?.marketDate||'')} · 갱신 ${esc(fxTime())}</div>${cfg.fx?.error?`<div class="tr-warn">환율 갱신 실패: ${esc(cfg.fx.error)}</div>`:''}`:''}
+      ${supportsFx(currency)?`<div class="tr-row"><span>현재 환율 원화 예상액</span><b>${won(c.total,currency)}</b></div><div class="tr-muted">${esc(currency)} 1 = ₩${num(fx?.rate).toLocaleString('ko-KR')} · 기준 ${esc(fx?.marketDate||'')} · 갱신 ${esc(fxTime(currency))}</div>${fx?.error?`<div class="tr-warn">환율 갱신 실패: ${esc(fx.error)}</div>`:''}`:''}
       ${configured?'':'<div class="tr-warn">단가가 0입니다. 아래에서 공급자 가격표를 입력하세요.</div>'}
       <div class="tr-muted">기록된 input: ${c.raw.toLocaleString()} · 메시지 ${esc(m.id||'')}</div>
       <details><summary>이 모델 단가 설정 (1M 토큰당)</summary><div class="tr-preset"><label>모델 단가 프리셋<select name="preset">${presetOptions}</select></label><button data-act="load-preset">값 불러오기</button></div><label data-field="cache-ttl">Claude 캐시 쓰기 TTL<select name="cacheTtl"><option value="5m" ${p.cacheTtl!=='1h'?'selected':''}>5분</option><option value="1h" ${p.cacheTtl==='1h'?'selected':''}>1시간</option></select></label><div class="tr-muted" data-field="cache-ttl-note">실제 TTL은 Marinara의 Anthropic 연결 설정에서 별도로 선택합니다.</div><div class="tr-grid">
       <label>일반 입력<input name="input" type="number" step="any" value="${num(p.input)}"></label><label>캐시 읽기<input name="read" type="number" step="any" value="${num(p.read)}"></label>
       <label>캐시 쓰기<input name="write" type="number" step="any" value="${num(p.write)}"></label><label>출력 (추론 포함)<input name="output" type="number" step="any" value="${num(p.output)}"></label></div>
-      <label>통화<input name="currency" value="${esc(cfg.currency)}"></label><label>API input 포함 관계<select name="adjustment"><option value="none" ${p.adjustment==='none'?'selected':''}>그대로 과금 (차감 없음)</option><option value="subtract-read" ${p.adjustment==='subtract-read'?'selected':''}>cache read를 input에서 차감</option><option value="subtract-both" ${p.adjustment==='subtract-both'?'selected':''}>cache read + write를 input에서 차감</option></select></label>
-      <button data-act="save">저장·재계산</button> ${supportsFx()?'<button data-act="fx">현재 환율 갱신</button>':''}</details>`;
+      <label>통화<select name="currency"><option value="USD" ${currency==='USD'?'selected':''}>USD (미국 달러)</option><option value="CNY" ${currency==='CNY'?'selected':''}>CNY (중국 위안화)</option></select></label><label>API input 포함 관계<select name="adjustment"><option value="none" ${p.adjustment==='none'?'selected':''}>그대로 과금 (차감 없음)</option><option value="subtract-read" ${p.adjustment==='subtract-read'?'selected':''}>cache read를 input에서 차감</option><option value="subtract-both" ${p.adjustment==='subtract-both'?'selected':''}>cache read + write를 input에서 차감</option></select></label>
+      <button data-act="save">저장·재계산</button> ${supportsFx(currency)?'<button data-act="fx">현재 환율 갱신</button>':''}</details>`;
     const selectedPreset=()=>PRESETS.find(item=>item.id===body.querySelector('[name=preset]').value);
     const syncCacheTtlVisibility=()=>{
       const preset=selectedPreset(), visible=String(g.provider||'').toLowerCase()==='anthropic'||preset?.write1h!=null;
@@ -455,10 +465,11 @@
       if(!preset) return;
       for(const field of ['input','read','output']) body.querySelector(`[name=${field}]`).value=String(preset[field]);
       syncPresetWrite();
+      body.querySelector('[name=currency]').value=String(preset.currency||'USD').toUpperCase();
       body.querySelector('[name=adjustment]').value=preset.adjustment;
     });
     body.querySelector('[data-act=save]').addEventListener('click',()=>saveProfile(g));
-    body.querySelector('[data-act=fx]')?.addEventListener('click',async()=>{ body.querySelector('[data-act=fx]').textContent='갱신 중…'; await updateFx(true); });
+    body.querySelector('[data-act=fx]')?.addEventListener('click',async()=>{ body.querySelector('[data-act=fx]').textContent='갱신 중…'; await updateFx(currency,true); });
     body.querySelector('details')?.addEventListener('toggle',()=>requestAnimationFrame(placePanel));
   }
   function renderHelp(){
@@ -473,8 +484,8 @@
       <label class="tr-toggle"><input type="checkbox" name="rpScreen" ${sources.rpScreen?'checked':''}><span><b>RP 화면 정보</b><small>화면 표시값 사용 (데이터 사용 없음)</small></span></label>
       <label class="tr-toggle"><input type="checkbox" name="rpPeekFallback" ${sources.rpPeekFallback?'checked':''}><span><b>RP Peek Prompt 보완</b><small>메시지의 전체 프롬프트 1회 조회 (데이터 사용)</small></span></label>
       <label class="tr-toggle"><input type="checkbox" name="conversationPeek" ${sources.conversationPeek?'checked':''}><span><b>대화모드 Peek Prompt</b><small>메시지의 전체 프롬프트 1회 조회 (데이터 사용)</small></span></label>
-      <div class="tr-settings-actions"><button type="button" data-act="save-sources">저장</button>${supportsFx()?'<button type="button" data-act="fx">환율 수동 갱신</button>':''}</div>
-      <div class="tr-muted" style="margin-top:8px">환율: ${num(cfg.fx?.rate)&&cfg.fx?.base===fxCurrency()?`${esc(fxCurrency())} 1 = ₩${num(cfg.fx.rate).toLocaleString('ko-KR')} · ${esc(fxTime())}`:'저장된 환율 없음'}</div>`;
+      <div class="tr-settings-actions"><button type="button" data-act="save-sources">저장</button><button type="button" data-act="fx">USD·CNY 환율 갱신</button></div>
+      <div class="tr-muted" style="margin-top:8px">USD 환율: ${num(fxFor('USD')?.rate)?`USD 1 = ₩${num(fxFor('USD')?.rate).toLocaleString('ko-KR')} · ${esc(fxTime('USD'))}`:'저장된 환율 없음'}<br>CNY 환율: ${num(fxFor('CNY')?.rate)?`CNY 1 = ₩${num(fxFor('CNY')?.rate).toLocaleString('ko-KR')} · ${esc(fxTime('CNY'))}`:'저장된 환율 없음'}</div>`;
     body.querySelector('[data-act=save-sources]').addEventListener('click',async()=>{
       cfg.sources={rpScreen:body.querySelector('[name=rpScreen]').checked,rpPeekFallback:body.querySelector('[name=rpPeekFallback]').checked,conversationPeek:body.querySelector('[name=conversationPeek]').checked};
       await storage.patch({config:cfg});
@@ -482,7 +493,7 @@
     });
     body.querySelector('[data-act=fx]')?.addEventListener('click',async()=>{
       body.querySelector('[data-act=fx]').textContent='갱신 중…';
-      await updateFx(true);
+      await updateAllFx(true);
     });
     requestAnimationFrame(placePanel);
   }
@@ -609,6 +620,7 @@
     const state=saved?.value&&typeof saved.value==='object'?saved.value:saved;
     const savedConfig=state?.config||{};
     cfg={...defaults,...savedConfig,sources:{...defaults.sources,...(savedConfig.sources||{})}};
+    updateAllFx(false).catch(()=>{});
   }).catch(()=>{});
   decorateWithin(document.body);
 })(marinara);
