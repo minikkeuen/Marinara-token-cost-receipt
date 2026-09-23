@@ -74,6 +74,7 @@
   const PRESET_GROUPS = [
     { label:'OpenAI', items:[
       {id:'gpt-6-astra',modelId:'gpt-6-astra',label:'GPT 6.0',input:10,read:1,write:12.5,output:50,adjustment:'subtract-both'},
+      {id:'gpt-6-sol',modelId:'gpt-6-sol',label:'GPT-6 Sol',input:2,read:.2,write:2.5,output:10,adjustment:'subtract-both'},
       {id:'gpt-5.6-terra',label:'GPT-5.6 Terra',input:2.5,read:.25,write:0,output:15,adjustment:'subtract-read'},
       {id:'gpt-5.6-sol',label:'GPT-5.6 Sol',input:5,read:.5,write:0,output:30,adjustment:'subtract-read'},
       {id:'gpt-5.6-luna',label:'GPT-5.6 Luna',input:1,read:.1,write:0,output:6,adjustment:'subtract-read'},
@@ -84,6 +85,7 @@
     ]},
     { label:'Anthropic', items:[
       {id:'claude-fable-5',label:'Claude Fable 5',input:10,read:1,write:12.5,write1h:20,output:50,adjustment:'none'},
+      {id:'claude-opus-5-5',modelId:'claude-opus-5-5',label:'Claude Opus 5.5',input:4,read:.2,write:5,write1h:8,output:20,adjustment:'none'},
       {id:'claude-opus-5',label:'Claude Opus 5',input:5,read:.5,write:6.25,write1h:10,output:25,adjustment:'none'},
       {id:'claude-sonnet-5-until-2026-08-31',modelId:'claude-sonnet-5',label:'Claude Sonnet 5',input:2,read:.2,write:2.5,write1h:4,output:10,adjustment:'none',activeUntil:'2026-09-01T00:00:00Z'},
       {id:'claude-sonnet-5',modelId:'claude-sonnet-5',label:'Claude Sonnet 5',input:2,read:.2,write:2.5,write1h:4,output:10,adjustment:'none',activeFrom:'2026-09-01T00:00:00Z'},
@@ -134,20 +136,24 @@
   const num = v => Number.isFinite(Number(v)) ? Number(v) : 0;
   const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const money = v => `${cfg.currency} ${v < .01 ? v.toFixed(6) : v.toFixed(4)}`;
+  const fxCurrency = () => String(cfg.currency||'USD').toUpperCase();
+  const supportsFx = () => ['USD','CNY'].includes(fxCurrency());
   const won = v => { const rate=num(cfg.fx?.rate), krw=v*rate; if(!rate) return '환율 없음'; return `약 ₩${krw.toLocaleString('ko-KR',{minimumFractionDigits:krw<1?4:krw<100?2:0,maximumFractionDigits:krw<1?4:krw<100?2:0})}`; };
   const fxTime = () => cfg.fx?.updatedAt ? new Date(cfg.fx.updatedAt).toLocaleString('ko-KR') : '아직 갱신 안 됨';
   async function updateFx(force=false){
-    if(String(cfg.currency).toUpperCase()!=='USD') return;
-    const fresh=cfg.fx?.rate && Date.now()-num(cfg.fx.updatedAt)<FX_TTL;
+    const currency=fxCurrency();
+    if(!supportsFx()) return;
+    const fresh=cfg.fx?.base===currency&&cfg.fx?.rate&&Date.now()-num(cfg.fx.updatedAt)<FX_TTL;
     if(fresh&&!force) return;
     try{
-      const res=await fetch('https://api.frankfurter.dev/v1/latest?from=USD&to=KRW',{cache:'no-store'});
+      const res=await fetch(`https://api.frankfurter.dev/v1/latest?from=${encodeURIComponent(currency)}&to=KRW`,{cache:'no-store'});
       if(!res.ok) throw new Error(`HTTP ${res.status}`);
       const data=await res.json(), rate=num(data?.rates?.KRW);
       if(!rate) throw new Error('KRW 환율 누락');
-      cfg.fx={rate,updatedAt:Date.now(),marketDate:data.date||null,source:'Frankfurter',error:null};
+      cfg.fx={base:currency,rate,updatedAt:Date.now(),marketDate:data.date||null,source:'Frankfurter',error:null};
     }catch(e){
-      cfg.fx={...(cfg.fx||{}),rate:num(cfg.fx?.rate),source:'Frankfurter',error:String(e?.message||e),lastAttemptAt:Date.now()};
+      const sameBase=cfg.fx?.base===currency;
+      cfg.fx={...(sameBase?cfg.fx:{}),base:currency,rate:sameBase?num(cfg.fx?.rate):0,source:'Frankfurter',error:String(e?.message||e),lastAttemptAt:Date.now()};
     }
     await storage.patch({config:cfg}).catch(()=>{});
     if(panelView==='settings') renderSettings();
@@ -421,14 +427,14 @@
       <div class="tr-row tr-total"><span>턴 합계</span><span>${money(c.total)}</span></div>
       ${c.tier?`<div class="tr-tier">장문 요금 적용: 입력 ${c.raw.toLocaleString()} &gt; ${c.tier.threshold.toLocaleString()}토큰</div>`:''}
       ${c.deepSeekPricing?`<div class="tr-tier">${c.deepSeekPricing.period==='legacy'?'DeepSeek 인상 전 요금 적용 · 2026-08-17 00:00 BJT 이전':c.deepSeekPricing.weekend?'DeepSeek 오프피크 요금 적용 · 베이징 주말':`DeepSeek ${c.deepSeekPricing.period==='peak'?'피크':'오프피크'} 요금 적용 · KST ${c.deepSeekPricing.period==='peak'?'10:00–13:00 / 15:00–19:00':'그 외 시간'}`}</div>`:''}
-      ${String(cfg.currency).toUpperCase()==='USD'?`<div class="tr-row"><span>현재 환율 원화 예상액</span><b>${won(c.total)}</b></div><div class="tr-muted">USD 1 = ₩${num(cfg.fx?.rate).toLocaleString('ko-KR')} · 기준 ${esc(cfg.fx?.marketDate||'')} · 갱신 ${esc(fxTime())}</div>${cfg.fx?.error?`<div class="tr-warn">환율 갱신 실패: ${esc(cfg.fx.error)}</div>`:''}`:''}
+      ${supportsFx()?`<div class="tr-row"><span>현재 환율 원화 예상액</span><b>${won(c.total)}</b></div><div class="tr-muted">${esc(fxCurrency())} 1 = ₩${num(cfg.fx?.rate).toLocaleString('ko-KR')} · 기준 ${esc(cfg.fx?.marketDate||'')} · 갱신 ${esc(fxTime())}</div>${cfg.fx?.error?`<div class="tr-warn">환율 갱신 실패: ${esc(cfg.fx.error)}</div>`:''}`:''}
       ${configured?'':'<div class="tr-warn">단가가 0입니다. 아래에서 공급자 가격표를 입력하세요.</div>'}
       <div class="tr-muted">기록된 input: ${c.raw.toLocaleString()} · 메시지 ${esc(m.id||'')}</div>
       <details><summary>이 모델 단가 설정 (1M 토큰당)</summary><div class="tr-preset"><label>모델 단가 프리셋<select name="preset">${presetOptions}</select></label><button data-act="load-preset">값 불러오기</button></div><label data-field="cache-ttl">Claude 캐시 쓰기 TTL<select name="cacheTtl"><option value="5m" ${p.cacheTtl!=='1h'?'selected':''}>5분</option><option value="1h" ${p.cacheTtl==='1h'?'selected':''}>1시간</option></select></label><div class="tr-muted" data-field="cache-ttl-note">실제 TTL은 Marinara의 Anthropic 연결 설정에서 별도로 선택합니다.</div><div class="tr-grid">
       <label>일반 입력<input name="input" type="number" step="any" value="${num(p.input)}"></label><label>캐시 읽기<input name="read" type="number" step="any" value="${num(p.read)}"></label>
       <label>캐시 쓰기<input name="write" type="number" step="any" value="${num(p.write)}"></label><label>출력 (추론 포함)<input name="output" type="number" step="any" value="${num(p.output)}"></label></div>
       <label>통화<input name="currency" value="${esc(cfg.currency)}"></label><label>API input 포함 관계<select name="adjustment"><option value="none" ${p.adjustment==='none'?'selected':''}>그대로 과금 (차감 없음)</option><option value="subtract-read" ${p.adjustment==='subtract-read'?'selected':''}>cache read를 input에서 차감</option><option value="subtract-both" ${p.adjustment==='subtract-both'?'selected':''}>cache read + write를 input에서 차감</option></select></label>
-      <button data-act="save">저장·재계산</button> ${String(cfg.currency).toUpperCase()==='USD'?'<button data-act="fx">현재 환율 갱신</button>':''}</details>`;
+      <button data-act="save">저장·재계산</button> ${supportsFx()?'<button data-act="fx">현재 환율 갱신</button>':''}</details>`;
     const selectedPreset=()=>PRESETS.find(item=>item.id===body.querySelector('[name=preset]').value);
     const syncCacheTtlVisibility=()=>{
       const preset=selectedPreset(), visible=String(g.provider||'').toLowerCase()==='anthropic'||preset?.write1h!=null;
@@ -467,8 +473,8 @@
       <label class="tr-toggle"><input type="checkbox" name="rpScreen" ${sources.rpScreen?'checked':''}><span><b>RP 화면 정보</b><small>화면 표시값 사용 (데이터 사용 없음)</small></span></label>
       <label class="tr-toggle"><input type="checkbox" name="rpPeekFallback" ${sources.rpPeekFallback?'checked':''}><span><b>RP Peek Prompt 보완</b><small>메시지의 전체 프롬프트 1회 조회 (데이터 사용)</small></span></label>
       <label class="tr-toggle"><input type="checkbox" name="conversationPeek" ${sources.conversationPeek?'checked':''}><span><b>대화모드 Peek Prompt</b><small>메시지의 전체 프롬프트 1회 조회 (데이터 사용)</small></span></label>
-      <div class="tr-settings-actions"><button type="button" data-act="save-sources">저장</button>${String(cfg.currency).toUpperCase()==='USD'?'<button type="button" data-act="fx">환율 수동 갱신</button>':''}</div>
-      <div class="tr-muted" style="margin-top:8px">환율: ${num(cfg.fx?.rate)?`USD 1 = ₩${num(cfg.fx.rate).toLocaleString('ko-KR')} · ${esc(fxTime())}`:'저장된 환율 없음'}</div>`;
+      <div class="tr-settings-actions"><button type="button" data-act="save-sources">저장</button>${supportsFx()?'<button type="button" data-act="fx">환율 수동 갱신</button>':''}</div>
+      <div class="tr-muted" style="margin-top:8px">환율: ${num(cfg.fx?.rate)&&cfg.fx?.base===fxCurrency()?`${esc(fxCurrency())} 1 = ₩${num(cfg.fx.rate).toLocaleString('ko-KR')} · ${esc(fxTime())}`:'저장된 환율 없음'}</div>`;
     body.querySelector('[data-act=save-sources]').addEventListener('click',async()=>{
       cfg.sources={rpScreen:body.querySelector('[name=rpScreen]').checked,rpPeekFallback:body.querySelector('[name=rpPeekFallback]').checked,conversationPeek:body.querySelector('[name=conversationPeek]').checked};
       await storage.patch({config:cfg});

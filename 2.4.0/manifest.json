@@ -3,8 +3,8 @@
   "version": 1,
   "config": {
     "name": "Token Cost Receipt",
-    "version": "3.0.6",
-    "description": "Adds per-message token receipt buttons, createdAt-based RP date/time display, and historical DeepSeek V4 pricing plus current model presets with peak/off-peak and weekend rules for Marinara Engine 2.4.1.",
+    "version": "3.0.7",
+    "description": "Adds per-message token cost receipts with current model presets, USD/CNY to KRW exchange-rate estimates, createdAt-based RP date/time display, and historical DeepSeek V4 pricing for Marinara Engine.",
     "runtime": "client",
     "enabled": false,
     "capabilities": [
