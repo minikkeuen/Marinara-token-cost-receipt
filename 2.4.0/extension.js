@@ -71,68 +71,10 @@
   const defaults = { currency:'USD', input:0, read:0, write:0, output:0, adjustment:'none', cacheTtl:'5m', profiles:{}, fx:null, sources:{rpScreen:true,rpPeekFallback:false,conversationPeek:true} };
   const CHAT_MESSAGES_TTL = 15 * 1000;
   const FX_TTL = 6 * 60 * 60 * 1000;
-  const PRESET_GROUPS = [
-    { label:'OpenAI', items:[
-      {id:'gpt-6-astra',modelId:'gpt-6-astra',label:'GPT 6.0',input:10,read:1,write:12.5,output:50,adjustment:'subtract-both',currency:'USD'},
-      {id:'gpt-6-sol',modelId:'gpt-6-sol',label:'GPT-6 Sol',input:2,read:.2,write:2.5,output:10,adjustment:'subtract-both',currency:'USD'},
-      {id:'gpt-5.6-terra',label:'GPT-5.6 Terra',input:2.5,read:.25,write:0,output:15,adjustment:'subtract-read',currency:'USD'},
-      {id:'gpt-5.6-sol',label:'GPT-5.6 Sol',input:5,read:.5,write:0,output:30,adjustment:'subtract-read',currency:'USD'},
-      {id:'gpt-5.6-luna',label:'GPT-5.6 Luna',input:1,read:.1,write:0,output:6,adjustment:'subtract-read',currency:'USD'},
-      {id:'gpt-5.5',label:'GPT-5.5',input:5,read:.5,write:0,output:30,adjustment:'subtract-read',currency:'USD'},
-      {id:'gpt-5.4',label:'GPT-5.4',input:2.5,read:.25,write:0,output:15,adjustment:'subtract-read',currency:'USD'},
-      {id:'gpt-5.4-mini',label:'GPT-5.4 mini',input:.75,read:.075,write:0,output:4.5,adjustment:'subtract-read',currency:'USD'},
-      {id:'gpt-5.4-nano',label:'GPT-5.4 nano',input:.2,read:.02,write:0,output:1.25,adjustment:'subtract-read',currency:'USD'},
-    ]},
-    { label:'Anthropic', items:[
-      {id:'claude-fable-5',label:'Claude Fable 5',input:10,read:1,write:12.5,write1h:20,output:50,adjustment:'none',currency:'USD'},
-      {id:'claude-opus-5-5',modelId:'claude-opus-5-5',label:'Claude Opus 5.5',input:4,read:.2,write:5,write1h:8,output:20,adjustment:'none',currency:'USD'},
-      {id:'claude-opus-5',label:'Claude Opus 5',input:5,read:.5,write:6.25,write1h:10,output:25,adjustment:'none',currency:'USD'},
-      {id:'claude-sonnet-5-until-2026-08-31',modelId:'claude-sonnet-5',label:'Claude Sonnet 5',input:2,read:.2,write:2.5,write1h:4,output:10,adjustment:'none',activeUntil:'2026-09-01T00:00:00Z',currency:'USD'},
-      {id:'claude-sonnet-5',modelId:'claude-sonnet-5',label:'Claude Sonnet 5',input:2,read:.2,write:2.5,write1h:4,output:10,adjustment:'none',activeFrom:'2026-09-01T00:00:00Z',currency:'USD'},
-      {id:'claude-opus-4-8',label:'Claude Opus 4.8',input:5,read:.5,write:6.25,write1h:10,output:25,adjustment:'none',currency:'USD'},
-      {id:'claude-opus-4-7',label:'Claude Opus 4.7',input:5,read:.5,write:6.25,write1h:10,output:25,adjustment:'none',currency:'USD'},
-      {id:'claude-opus-4-6',label:'Claude Opus 4.6',input:5,read:.5,write:6.25,write1h:10,output:25,adjustment:'none',currency:'USD'},
-      {id:'claude-sonnet-4-6',label:'Claude Sonnet 4.6',input:3,read:.3,write:3.75,write1h:6,output:15,adjustment:'none',currency:'USD'},
-    ]},
-    { label:'Google Gemini', items:[
-      {id:'gemini-3.8-flash',label:'Gemini 3.8 Flash',input:.75,read:.075,write:0,output:3.75,adjustment:'none',currency:'USD'},
-      {id:'gemini-3.7-flash',label:'Gemini 3.7 Flash',input:.75,read:.075,write:0,output:3.75,adjustment:'none',currency:'USD'},
-      {id:'gemini-3.6-flash',label:'Gemini 3.6 Flash',input:1.5,read:.15,write:0,output:7.5,adjustment:'none',currency:'USD'},
-      {id:'gemini-3.5-flash',label:'Gemini 3.5 Flash',input:1.5,read:.15,write:0,output:9,adjustment:'none',currency:'USD'},
-      {id:'gemini-3.1-pro-preview',label:'Gemini 3.1 Pro Preview',input:2,read:.2,write:0,output:12,adjustment:'none',currency:'USD'},
-      {id:'gemini-3.1-flash-lite',label:'Gemini 3.1 Flash-Lite',input:.25,read:.025,write:0,output:1.5,adjustment:'none',currency:'USD'},
-    ]},
-    { label:'DeepSeek', items:[
-      {id:'deepseek-v4.1-flash',label:'DeepSeek 4.1 Flash',input:.15,read:.003,write:0,output:.6,adjustment:'subtract-read',dynamicPricing:'deepseek-v4.1',currency:'USD'},
-      {id:'deepseek-v4-pro',label:'DeepSeek V4 Pro',input:.66,read:.022,write:0,output:1.98,adjustment:'subtract-read',dynamicPricing:'deepseek-v4',currency:'USD'},
-    ]},
-    { label:'GLM', items:[
-      {id:'glm-5.3',label:'GLM-5.3',input:1.4,read:.26,write:0,output:4.4,adjustment:'none',currency:'USD'},
-      {id:'glm-5.2',label:'GLM-5.2',input:1.4,read:.26,write:0,output:4.4,adjustment:'none',currency:'USD'},
-      {id:'glm-5.1',label:'GLM-5.1',input:1.4,read:.26,write:0,output:4.4,adjustment:'none',currency:'USD'},
-    ]},
-    { label:'Kimi', items:[
-      {id:'kimi-k3',label:'Kimi K3',input:3,read:.3,write:0,output:15,adjustment:'none',currency:'USD'},
-      {id:'kimi-k2.6',label:'Kimi K2.6',input:.95,read:.16,write:0,output:4,adjustment:'none',currency:'USD'},
-    ]},
-  ];
-  const PRESETS = PRESET_GROUPS.flatMap(group=>group.items);
-  const DEEPSEEK_V4_RATES = {
-    'deepseek-v4.1-flash': {offPeak:{input:.15,read:.003,write:0,output:.6},peak:{input:.30,read:.006,write:0,output:1.2}},
-    'deepseek-v4-flash': {offPeak:{input:.22,read:.007,write:0,output:.66},peak:{input:.44,read:.014,write:0,output:1.32}},
-    'deepseek-v4-pro': {offPeak:{input:.66,read:.022,write:0,output:1.98},peak:{input:1.32,read:.044,write:0,output:3.96}},
-  };
-  const DEEPSEEK_V4_LEGACY_RATES = {
-    'deepseek-v4-flash': {input:.14,read:.0028,write:0,output:.28},
-    'deepseek-v4-pro': {input:.435,read:.003625,write:0,output:.87},
-  };
-  // New V4 peak/off-peak pricing began at 2026-08-17 00:00 Beijing time.
-  const DEEPSEEK_V4_TIER_START = Date.parse('2026-08-16T16:00:00Z');
-  // Weekend-wide off-peak billing began at 2026-08-23 00:00 Beijing time.
-  const DEEPSEEK_WEEKEND_RULE_START = Date.parse('2026-08-22T16:00:00Z');
+  const { PRESET_GROUPS, PRESETS, DEEPSEEK_V4_RATES, DEEPSEEK_V4_LEGACY_RATES, DEEPSEEK_V4_TIER_START, DEEPSEEK_WEEKEND_RULE_START, DEEPSEEK_V41_FLASH_START } = createTokenCostReceiptPresetDefinitions();
   let cfg = { ...defaults }, lastReceipt = null, anchorButton = null, activeRequest = null, panelView = 'receipt';
-  let chatMessageCache = { chatId:null, loadedAt:0, byId:new Map(), promise:null };
-  let metadataSyncTimer = 0;
+  const chatMessageCaches = new Map();
+  let receiptContext = null;
   const num = v => Number.isFinite(Number(v)) ? Number(v) : 0;
   const esc = s => String(s ?? '').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const profileCurrency = p => String(p?.currency||cfg.currency||'USD').toUpperCase();
@@ -210,35 +152,40 @@
     const parsed=Date.parse(text);
     return Number.isFinite(parsed)?parsed:null;
   }
-  async function loadChatMessageMetadata(force=false){
-    const chatId=currentChatId();
+  async function loadChatMessageMetadata(chatId){
     if(!chatId) return null;
-    const now=Date.now();
-    if(chatMessageCache.chatId===chatId&&!force&&chatMessageCache.byId.size&&now-chatMessageCache.loadedAt<CHAT_MESSAGES_TTL) return chatMessageCache;
-    if(chatMessageCache.chatId===chatId&&chatMessageCache.promise) return chatMessageCache.promise;
-    const promise=(async()=>{
-      const messages=await apiFetch(`chats/${encodeURIComponent(chatId)}/messages`);
-      const rows=Array.isArray(messages)?messages:[];
-      const byId=new Map();
-      for(const message of rows){
-        if(!message?.id||!message?.createdAt) continue;
-        const timestamp=parseAbsoluteTimestamp(message.createdAt);
-        if(timestamp==null) continue;
-        byId.set(String(message.id),{createdAt:String(message.createdAt),timestamp});
+    let cache=chatMessageCaches.get(chatId);
+    if(cache?.promise) return cache.promise;
+    // Empty/missing metadata and failed attempts also observe the TTL.
+    if(cache&&Date.now()-cache.loadedAt<CHAT_MESSAGES_TTL) return cache;
+    cache={chatId,loadedAt:0,byId:new Map(),promise:null};
+    chatMessageCaches.set(chatId,cache);
+    cache.promise=(async()=>{
+      try{
+        const messages=await apiFetch(`chats/${encodeURIComponent(chatId)}/messages`);
+        for(const message of Array.isArray(messages)?messages:[]){
+          if(!message?.id) continue;
+          const timestamp=parseAbsoluteTimestamp(message.createdAt);
+          let extra=message.extra;
+          if(typeof extra==='string'){try{extra=JSON.parse(extra)}catch{extra=null}}
+          const generationInfo=extra?.generationInfo;
+          const generation=generationInfo&&typeof generationInfo==='object'?{
+            provider:generationInfo.provider,model:generationInfo.model,
+            tokensPrompt:generationInfo.tokensPrompt,tokensCompletion:generationInfo.tokensCompletion,
+            tokensCachedPrompt:generationInfo.tokensCachedPrompt,tokensReasoning:generationInfo.tokensReasoning,
+          }:null;
+          if(timestamp==null&&!generation) continue;
+          cache.byId.set(String(message.id),{createdAt:timestamp==null?null:String(message.createdAt),timestamp,generation});
+        }
+      }catch{
+        // Retry on a later click after the TTL, never immediately for a missing ID.
+      }finally{
+        cache.loadedAt=Date.now();
+        cache.promise=null;
       }
-      chatMessageCache={chatId,loadedAt:Date.now(),byId,promise:null};
-      return chatMessageCache;
-    })().catch(error=>{
-      if(chatMessageCache.chatId===chatId) chatMessageCache.promise=null;
-      throw error;
-    });
-    chatMessageCache={
-      chatId,
-      loadedAt:chatMessageCache.chatId===chatId?chatMessageCache.loadedAt:0,
-      byId:chatMessageCache.chatId===chatId?chatMessageCache.byId:new Map(),
-      promise,
-    };
-    return promise;
+      return cache;
+    })();
+    return cache.promise;
   }
   function formatRpDateTime(timestamp){
     const date=new Date(Number(timestamp));
@@ -248,8 +195,10 @@
     const time=date.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit',hour12:true});
     return `${month}.${day} ${time}`;
   }
-  function applyCreatedAtToMessage(messageElement,meta){
-    if(!(messageElement instanceof Element)||!meta) return;
+  function applyCreatedAtToMessage(messageElement,meta,chatId){
+    if(!(messageElement instanceof Element)||meta?.timestamp==null) return;
+    messageElement.dataset.tokenReceiptChatId=chatId;
+    messageElement.dataset.tokenReceiptMessageId=messageElement.getAttribute('data-message-id');
     messageElement.dataset.tokenReceiptCreatedAt=meta.createdAt;
     messageElement.dataset.tokenReceiptTimestamp=String(meta.timestamp);
     if(messageElement.closest('[data-component="ChatArea.Conversation"]')) return;
@@ -258,43 +207,51 @@
     if(!(timeElement instanceof HTMLElement)) return;
     const formatted=formatRpDateTime(meta.timestamp);
     if(!formatted) return;
-    timeElement.textContent=formatted;
+    if(timeElement.textContent!==formatted) timeElement.textContent=formatted;
     timeElement.dataset.tokenReceiptDateTime='true';
   }
-  async function createdAtForMessage(messageElement,forceIfMissing=true){
+  function applyCachedMetadataToDom(cache){
+    if(!cache||currentChatId()!==cache.chatId) return;
+    for(const message of document.querySelectorAll('[data-message-id]')){
+      const meta=cache.byId.get(String(message.getAttribute('data-message-id')||''));
+      if(meta) applyCreatedAtToMessage(message,meta,cache.chatId);
+    }
+  }
+  async function createdAtForMessage(messageElement,context){
     if(!(messageElement instanceof Element)) return null;
-    const cachedTimestamp=parseAbsoluteTimestamp(messageElement.dataset.tokenReceiptCreatedAt)||parseAbsoluteTimestamp(messageElement.dataset.tokenReceiptTimestamp);
-    if(cachedTimestamp!=null) return {createdAt:messageElement.dataset.tokenReceiptCreatedAt||new Date(cachedTimestamp).toISOString(),timestamp:cachedTimestamp};
-    const messageId=messageElement.getAttribute('data-message-id');
-    if(!messageId) return null;
-    let cache=await loadChatMessageMetadata(false).catch(()=>null);
-    let meta=cache?.byId?.get(String(messageId))||null;
-    if(!meta&&forceIfMissing){
-      cache=await loadChatMessageMetadata(true).catch(()=>null);
-      meta=cache?.byId?.get(String(messageId))||null;
+    const cachedTimestamp=parseAbsoluteTimestamp(messageElement.dataset.tokenReceiptCreatedAt)??parseAbsoluteTimestamp(messageElement.dataset.tokenReceiptTimestamp);
+    if(cachedTimestamp!=null&&messageElement.dataset.tokenReceiptChatId===context.chatId
+      &&messageElement.dataset.tokenReceiptMessageId===context.messageId) return {createdAt:messageElement.dataset.tokenReceiptCreatedAt||new Date(cachedTimestamp).toISOString(),timestamp:cachedTimestamp};
+    const cache=await loadChatMessageMetadata(context.chatId);
+    if(!receiptContextIsCurrent(context)) return null;
+    applyCachedMetadataToDom(cache);
+    const meta=cache?.byId.get(String(context.messageId));
+    return meta?.timestamp!=null?meta:null;
+  }
+  const hasReasoningCount=g=>typeof g?.tokensReasoning==='number'&&Number.isFinite(g.tokensReasoning)&&g.tokensReasoning>=0;
+  const geminiModel=model=>String(model||'').toLowerCase().replace(/^google\//,'');
+  async function completeGeminiUsage(usage,source,context){
+    if(!geminiModel(usage.model).startsWith('gemini-')) return;
+    // Preserve the original provider before the existing model-name fallback.
+    if(source==='peek'&&usage.generationProvider&&usage.generationProvider!=='unknown'){
+      if(usage.generationProvider!=='google'||hasReasoningCount(usage)) return;
     }
-    if(meta) applyCreatedAtToMessage(messageElement,meta);
-    return meta;
+    const cache=await loadChatMessageMetadata(context.chatId);
+    if(!receiptContextIsCurrent(context)) return;
+    const generation=cache?.byId.get(String(context.messageId))?.generation;
+    if(generation?.provider!=='google'||!hasReasoningCount(generation)
+      ||geminiModel(generation.model)!==geminiModel(usage.model)) return;
+    // Cached metadata must describe the displayed usage, not an earlier swipe/response.
+    if(generation.tokensCompletion!==usage.tokensCompletion||generation.tokensPrompt!==usage.tokensPrompt
+      ||num(generation.tokensCachedPrompt)!==num(usage.tokensCachedPrompt)) return;
+    usage.geminiDirectApi=true;
+    usage.tokensReasoning=generation.tokensReasoning;
   }
-  async function syncVisibleMessageMetadata(){
-    const messages=[...document.querySelectorAll('[data-message-id]')];
-    if(!messages.length) return;
-    let cache=await loadChatMessageMetadata(false).catch(()=>null);
-    if(!cache) return;
-    const missing=messages.some(message=>!cache.byId.has(String(message.getAttribute('data-message-id')||'')));
-    if(missing) cache=await loadChatMessageMetadata(true).catch(()=>cache);
-    for(const message of messages){
-      const meta=cache?.byId?.get(String(message.getAttribute('data-message-id')||''));
-      if(meta) applyCreatedAtToMessage(message,meta);
-    }
-  }
-  function scheduleMetadataSync(){
-    if(metadataSyncTimer) clearTimeout(metadataSyncTimer);
-    metadataSyncTimer=setTimeout(()=>{metadataSyncTimer=0;void syncVisibleMessageMetadata()},60);
-  }
-  function messagePricingTime(messageElement){
-    const timestamp=parseAbsoluteTimestamp(messageElement?.dataset?.tokenReceiptCreatedAt)||parseAbsoluteTimestamp(messageElement?.dataset?.tokenReceiptTimestamp);
-    return timestamp==null?null:{timestamp,source:'message-createdAt'};
+  function receiptContextIsCurrent(context){
+    return receiptContext===context&&!root.hidden&&anchorButton===context.button
+      &&context.button.isConnected&&context.messageElement.isConnected
+      &&context.messageElement.getAttribute('data-message-id')===context.messageId
+      &&currentChatId()===context.chatId;
   }
   function usageFromScreen(messageElement){
     const label=[...messageElement.querySelectorAll('[title]')]
@@ -320,6 +277,7 @@
   }
   function deepSeekModelId(value){
     const model=String(value||'').toLowerCase().replace(/^deepseek\//,'');
+    if(/^deepseek-flash(?:-|$)/.test(model)) return 'deepseek-v4.1-flash';
     if(/^deepseek-v4[.-]1-flash(?:-|$)/.test(model)||/^deepseek-v4\.1-flash(?:-|$)/.test(model)) return 'deepseek-v4.1-flash';
     if(/^deepseek-v4-flash(?:-|$)/.test(model)) return 'deepseek-v4-flash';
     if(/^deepseek-v4-pro(?:-|$)/.test(model)) return 'deepseek-v4-pro';
@@ -331,10 +289,11 @@
     return day===0||day===6;
   }
   function deepSeekPricingAt(modelOrId,now=Date.now()){
-    const id=DEEPSEEK_V4_RATES[modelOrId]?modelOrId:deepSeekModelId(modelOrId);
+    let id=DEEPSEEK_V4_RATES[modelOrId]?modelOrId:deepSeekModelId(modelOrId);
     if(!id) return null;
     const timestamp=Number(now);
     if(!Number.isFinite(timestamp)) return null;
+    if(id==='deepseek-v4-flash'&&timestamp>=DEEPSEEK_V41_FLASH_START) id='deepseek-v4.1-flash';
     if(id!=='deepseek-v4.1-flash'&&timestamp<DEEPSEEK_V4_TIER_START){
       return {id,period:'legacy',historical:true,weekend:false,...DEEPSEEK_V4_LEGACY_RATES[id]};
     }
@@ -349,7 +308,7 @@
     const id=deepSeekModelId(g.model);
     if(!id) return null;
     if(Number.isFinite(Number(g.messageTimestamp))) return deepSeekPricingAt(id,Number(g.messageTimestamp));
-    return deepSeekPricingAt(id);
+    return null;
   }
   function effectivePreset(p,now=Date.now()){
     if(!p?.dynamicPricing) return p;
@@ -361,25 +320,27 @@
   }
   function currentPreset(g){
     const model=String(g.model||'').toLowerCase().replace(/^(?:openai|anthropic|google)\//,'');
-    const exact=PRESETS.find(p=>model===(p.modelId||p.id)&&presetIsActive(p));
-    if(exact) return exact;
+    const candidates=PRESETS.flatMap(p=>(p.modelIds||[p.modelId||p.id]).map(modelId=>({p,modelId})));
+    const exact=candidates.find(({p,modelId})=>model===modelId&&presetIsActive(p));
+    if(exact) return exact.p;
+    // This newly listed model must not fall through to the pre-existing GPT-6 Astra fallback.
+    if(/^gpt-6-luna(?:-|$)/.test(model)) return PRESETS.find(p=>p.id==='gpt-6-luna')||null;
     if(/^gpt-6(?:\.0)?(?:-astra)?(?:-|$)/.test(model)) return PRESETS.find(p=>p.id==='gpt-6-astra')||null;
     if(/^gpt-5\.6(?:-\d|$)/.test(model)) return PRESETS.find(p=>p.id==='gpt-5.6-sol')||null;
     if(/^gemini-3\.1-pro(?:-|$)/.test(model)) return PRESETS.find(p=>p.id==='gemini-3.1-pro-preview')||null;
-    return [...PRESETS].sort((a,b)=>(b.modelId||b.id).length-(a.modelId||a.id).length).find(p=>{
-      const presetModel=p.modelId||p.id;
-      if(!presetIsActive(p)||!model.startsWith(`${presetModel}-`)) return false;
+    return candidates.sort((a,b)=>b.modelId.length-a.modelId.length).find(({p,modelId})=>{
+      if(!presetIsActive(p)||!model.startsWith(`${modelId}-`)) return false;
       if(p.id==='gpt-5.4'&&/^gpt-5\.4-(?:mini|nano|pro)(?:-|$)/.test(model)) return false;
       if(p.id==='gpt-5.5'&&/^gpt-5\.5-pro(?:-|$)/.test(model)) return false;
       return true;
-    })||null;
+    })?.p||null;
   }
   function tierFor(g,raw){
     const provider=String(g.provider||'').toLowerCase(), model=String(g.model||'').toLowerCase().replace(/^openai\//,'');
     if(provider==='google'&&/^gemini-3\.1-pro(?:-preview)?(?:-|$)/.test(model)&&raw>200000){
       return {threshold:200000,input:2,read:2,write:1,output:1.5};
     }
-    const gpt6=/^gpt-6(?:\.0)?(?:-astra)?(?:-|$)/.test(model);
+    const gpt6=/^(?:gpt-6(?:\.0)?(?:-astra)?|gpt-6\.1-sol)(?:-|$)/.test(model);
     if(provider==='openai'&&gpt6&&raw>272000){
       return {threshold:272000,input:2,read:2,write:2,output:1.5};
     }
@@ -387,12 +348,13 @@
     const gpt55=/^gpt-5\.5(?:-\d|$)/.test(model);
     const gpt56=/^gpt-5\.6(?:$|-(?:sol(?:-pro)?|terra|luna)(?:-|$))/.test(model);
     if(provider==='openai'&&(gpt54||gpt55||gpt56)&&raw>272000){
-      return {threshold:272000,input:2,read:2,write:1,output:1.5};
+      return {threshold:272000,input:2,read:2,write:gpt56?2:1,output:1.5};
     }
     return null;
   }
   function compute(g,p){
-    const raw=num(g.tokensPrompt), read=num(g.tokensCachedPrompt), write=num(g.tokensCacheWritePrompt), out=num(g.tokensCompletion);
+    const raw=num(g.tokensPrompt), read=num(g.tokensCachedPrompt), write=num(g.tokensCacheWritePrompt);
+    const out=num(g.tokensCompletion)+(g.geminiDirectApi===true&&hasReasoningCount(g)?g.tokensReasoning:0);
     const deepSeekPricing=deepSeekPricingForUsage(g);
     const effective=deepSeekPricing?{...p,...deepSeekPricing,adjustment:'subtract-read'}:p;
     let ordinary=raw;
@@ -436,6 +398,7 @@
       <div class="tr-row tr-usage"><span>출력 (추론 포함)</span><span class="tr-tokens">${c.out.toLocaleString()} tok</span><b>${money(c.parts.output,currency)}</b></div>
       <div class="tr-row tr-total"><span>턴 합계</span><span>${money(c.total,currency)}</span></div>
       ${c.tier?`<div class="tr-tier">장문 요금 적용: 입력 ${c.raw.toLocaleString()} &gt; ${c.tier.threshold.toLocaleString()}토큰</div>`:''}
+      ${g.messageTimestampSource==='current-time-estimate'?'<div class="tr-warn">메시지 작성 시각 확인 실패 · 조회 시점의 현재 요금 기준 추정값입니다.</div>':''}
       ${c.deepSeekPricing?`<div class="tr-tier">${c.deepSeekPricing.period==='legacy'?'DeepSeek 인상 전 요금 적용 · 2026-08-17 00:00 BJT 이전':c.deepSeekPricing.weekend?'DeepSeek 오프피크 요금 적용 · 베이징 주말':`DeepSeek ${c.deepSeekPricing.period==='peak'?'피크':'오프피크'} 요금 적용 · KST ${c.deepSeekPricing.period==='peak'?'10:00–13:00 / 15:00–19:00':'그 외 시간'}`}</div>`:''}
       ${supportsFx(currency)?`<div class="tr-row"><span>현재 환율 원화 예상액</span><b>${won(c.total,currency)}</b></div><div class="tr-muted">${esc(currency)} 1 = ₩${num(fx?.rate).toLocaleString('ko-KR')} · 기준 ${esc(fx?.marketDate||'')} · 갱신 ${esc(fxTime(currency))}</div>${fx?.error?`<div class="tr-warn">환율 갱신 실패: ${esc(fx.error)}</div>`:''}`:''}
       ${configured?'':'<div class="tr-warn">단가가 0입니다. 아래에서 공급자 가격표를 입력하세요.</div>'}
@@ -474,14 +437,14 @@
   }
   function renderHelp(){
     setPanelView('help');
-    body.innerHTML=`<div class="tr-help"><h3>간단 설정</h3><ol><li>모델 가격표에서 <b>100만 토큰당 가격 (1M)</b>을 입력합니다.</li><li>가격표에 없는 항목은 <b>0</b>으로 둡니다.</li><li>아래에서 차감 방식을 고르고 저장합니다.</li></ol><h4>메시지별 영수증</h4><ul><li>AI 메시지 아래의 영수증 아이콘을 누르면 해당 메시지 한 건의 예상 비용을 확인합니다.</li><li><b>RP 화면 정보:</b> 화면 표시값 사용 (데이터 사용 없음)</li><li><b>Peek Prompt:</b> 메시지의 전체 프롬프트 1회 조회 (데이터 사용)</li><li>조회 방식은 톱니바퀴 버튼에서 선택합니다.</li></ul><h4>뭘 고르나요?</h4><ul><li><b>캐시 읽기가 0:</b> 그대로 과금</li><li><b>Claude 공식 API:</b> 그대로 과금</li><li><b>OpenAI·DeepSeek 공식 API:</b> cache read 차감</li><li><b>Gemini·GLM·OpenRouter:</b> 우선 그대로 과금</li></ul><div class="tr-help-note">OpenRouter는 <b>OpenRouter 가격표</b>를 사용하세요.</div><div class="tr-muted" style="margin-top:10px">표시 금액은 입력한 토큰 단가를 기준으로 계산한 예상액입니다.</div></div>`;
+    body.innerHTML=`<div class="tr-help"><h3>간단 설정</h3><ol><li>모델 가격표에서 <b>100만 토큰당 가격 (1M)</b>을 입력합니다.</li><li>가격표에 없는 항목은 <b>0</b>으로 둡니다.</li><li>아래에서 차감 방식을 고르고 저장합니다.</li></ol><h4>메시지별 영수증</h4><ul><li>AI 메시지 아래의 영수증 아이콘을 누르면 해당 메시지 한 건의 예상 비용을 확인합니다.</li><li><b>RP 화면 정보:</b> 토큰은 화면 표시값 사용 · 작성 시각은 클릭 시 조회</li><li><b>Peek Prompt:</b> 메시지의 전체 프롬프트 1회 조회 (데이터 사용)</li><li>조회 방식은 톱니바퀴 버튼에서 선택합니다.</li></ul><h4>뭘 고르나요?</h4><ul><li><b>캐시 읽기가 0:</b> 그대로 과금</li><li><b>Claude 공식 API:</b> 그대로 과금</li><li><b>OpenAI·DeepSeek 공식 API:</b> cache read 차감</li><li><b>Gemini·GLM 공식 API:</b> cache read 차감</li><li><b>OpenRouter:</b> 우선 그대로 과금</li></ul><div class="tr-help-note">OpenRouter는 <b>OpenRouter 가격표</b>를 사용하세요.</div><div class="tr-help-note">기존 Gemini·GLM 저장 프로필은 자동 변경하지 않습니다. 공식 API 사용 시 해당 모델 프리셋의 <b>값 불러오기</b> 후 <b>저장·재계산</b>을 누르거나, 차감 방식만 <b>cache read를 input에서 차감</b>으로 변경해 저장하세요.</div><div class="tr-muted" style="margin-top:10px">표시 금액은 입력한 토큰 단가를 기준으로 계산한 예상액입니다.</div></div>`;
     requestAnimationFrame(placePanel);
   }
   function renderSettings(){
     setPanelView('settings');
     const sources={...defaults.sources,...(cfg.sources||{})};
     body.innerHTML=`<h3 class="tr-settings-title">조회 방식</h3>
-      <label class="tr-toggle"><input type="checkbox" name="rpScreen" ${sources.rpScreen?'checked':''}><span><b>RP 화면 정보</b><small>화면 표시값 사용 (데이터 사용 없음)</small></span></label>
+      <label class="tr-toggle"><input type="checkbox" name="rpScreen" ${sources.rpScreen?'checked':''}><span><b>RP 화면 정보</b><small>토큰은 화면 표시값 사용 · 작성 시각은 클릭 시 조회</small></span></label>
       <label class="tr-toggle"><input type="checkbox" name="rpPeekFallback" ${sources.rpPeekFallback?'checked':''}><span><b>RP Peek Prompt 보완</b><small>메시지의 전체 프롬프트 1회 조회 (데이터 사용)</small></span></label>
       <label class="tr-toggle"><input type="checkbox" name="conversationPeek" ${sources.conversationPeek?'checked':''}><span><b>대화모드 Peek Prompt</b><small>메시지의 전체 프롬프트 1회 조회 (데이터 사용)</small></span></label>
       <div class="tr-settings-actions"><button type="button" data-act="save-sources">저장</button><button type="button" data-act="fx">USD·CNY 환율 갱신</button></div>
@@ -507,6 +470,8 @@
     else root.style.top=`${Math.max(12,rect.top-root.offsetHeight-8)}px`;
   }
   function closePanel(){
+    receiptContext?.button.removeAttribute('aria-busy');
+    receiptContext=null;
     activeRequest?.abort(); activeRequest=null;
     root.hidden=true; setPanelView('receipt'); lastReceipt=null; anchorButton=null;
     for(const button of document.querySelectorAll(`.${MESSAGE_BUTTON}[aria-expanded="true"]`)) button.setAttribute('aria-expanded','false');
@@ -516,8 +481,7 @@
     body.innerHTML=`<div class="tr-error"><b>${esc(message)}</b></div>${detail?`<div class="tr-muted" style="margin-top:7px">${esc(detail)}</div>`:''}`;
     requestAnimationFrame(placePanel);
   }
-  async function usageFromPeek(messageId){
-    const chatId=currentChatId();
+  async function usageFromPeek(messageId,chatId){
     if(!chatId) throw new Error('현재 채팅 ID를 찾지 못했습니다. 채팅을 다시 선택해 주세요.');
     activeRequest?.abort();
     const request=new AbortController();
@@ -525,7 +489,8 @@
     try{
       const data=await apiFetch(`/chats/${encodeURIComponent(chatId)}/peek-prompt`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messageId}),signal:request.signal});
       if(!data?.generationInfo) throw new Error('이 메시지에는 저장된 generationInfo가 없습니다.');
-      const usage={...data.generationInfo};
+      const usage={...data.generationInfo,generationProvider:data.generationInfo.provider,
+        geminiDirectApi:data.generationInfo.provider==='google'};
       if(!usage.provider||usage.provider==='custom'||usage.provider==='unknown') usage.provider=inferProvider(usage.model);
       return usage;
     }finally{
@@ -533,6 +498,7 @@
     }
   }
   async function openReceipt(messageElement,button){
+    receiptContext?.button.removeAttribute('aria-busy');
     activeRequest?.abort(); activeRequest=null;
     for(const other of document.querySelectorAll(`.${MESSAGE_BUTTON}[aria-expanded="true"]`)) other.setAttribute('aria-expanded','false');
     anchorButton=button; button.setAttribute('aria-expanded','true');
@@ -540,29 +506,37 @@
     body.innerHTML='<div class="tr-muted">토큰 사용량을 읽는 중…</div>';
     requestAnimationFrame(placePanel);
     const messageId=messageElement.getAttribute('data-message-id');
+    const context={chatId:currentChatId(),messageId,messageElement,button};
+    receiptContext=context;
     const isConversation=Boolean(messageElement.closest('[data-component="ChatArea.Conversation"]'));
     const sources={...defaults.sources,...(cfg.sources||{})};
     try{
+      if(!context.chatId) throw new Error('현재 채팅 ID를 찾지 못했습니다. 채팅을 다시 선택해 주세요.');
       let usage=null, source='';
       if(!isConversation&&sources.rpScreen){ usage=usageFromScreen(messageElement); if(usage) source='screen'; }
       const allowPeek=isConversation?sources.conversationPeek:sources.rpPeekFallback;
-      if(!usage&&allowPeek){ button.setAttribute('aria-busy','true'); try{usage=await usageFromPeek(messageId);source='peek'}finally{button.removeAttribute('aria-busy')} }
-      if(root.hidden||anchorButton!==button) return;
+      if(!usage&&allowPeek){ button.setAttribute('aria-busy','true'); try{usage=await usageFromPeek(messageId,context.chatId);source='peek'}finally{if(receiptContext===context)button.removeAttribute('aria-busy')} }
+      if(!receiptContextIsCurrent(context)) return;
       if(!usage){
         showError(isConversation?'대화모드 Peek Prompt 조회가 꺼져 있습니다.':'화면에서 모델·토큰 정보를 찾지 못했습니다.',isConversation?'설정에서 대화모드 Peek Prompt를 켜 주세요.':'Marinara의 모델명·토큰 사용량 표시를 켜거나 RP Peek Prompt 보완을 허용해 주세요.');
         return;
       }
-      await createdAtForMessage(messageElement,true);
-      const messageTime=messagePricingTime(messageElement);
+      const messageTime=await createdAtForMessage(messageElement,context);
+      if(!receiptContextIsCurrent(context)) return;
+      await completeGeminiUsage(usage,source,context);
+      if(!receiptContextIsCurrent(context)) return;
       if(messageTime){
         if(Number.isFinite(Number(messageTime.timestamp))) usage.messageTimestamp=messageTime.timestamp;
-        usage.messageTimestampSource=messageTime.source;
+        usage.messageTimestampSource='message-createdAt';
+      }else if(deepSeekModelId(usage.model)){
+        usage.messageTimestamp=Date.now();
+        usage.messageTimestampSource='current-time-estimate';
       }
       lastReceipt={message:{id:messageId},usage,source};
       render(lastReceipt.message,usage,source);
       requestAnimationFrame(placePanel);
     }catch(error){
-      if(error?.name==='AbortError') return;
+      if(error?.name==='AbortError'||!receiptContextIsCurrent(context)) return;
       showError('영수증 정보를 불러오지 못했습니다.',error?.message||String(error));
     }
   }
@@ -591,19 +565,20 @@
     const owner=node.matches('.mari-message-actions')?node.closest('[data-message-id]'):null;
     if(owner) decorateMessage(owner);
     for(const message of node.querySelectorAll('[data-message-id]')) decorateMessage(message);
-    scheduleMetadataSync();
   }
   const observer=new MutationObserver(records=>{
+    if(receiptContext&&!receiptContextIsCurrent(receiptContext)) closePanel();
     for(const record of records){
-      if(record.type==='attributes'&&record.target instanceof Element){
+      if(record.type==='attributes'&&record.attributeName==='aria-hidden'&&record.target instanceof Element){
         const button=record.target.querySelector(`.${MESSAGE_BUTTON}`);
         if(button) button.tabIndex=record.target.getAttribute('aria-hidden')==='true'?-1:0;
       }
       for(const node of record.addedNodes) decorateWithin(node);
     }
+    applyCachedMetadataToDom(chatMessageCaches.get(currentChatId()));
   });
-  observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['aria-hidden']});
-  marinara.onCleanup(()=>{observer.disconnect();activeRequest?.abort();if(metadataSyncTimer)clearTimeout(metadataSyncTimer);document.querySelectorAll(`.${MESSAGE_BUTTON}`).forEach(button=>button.remove())});
+  observer.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['aria-hidden','class','data-chat-id','data-message-id']});
+  marinara.onCleanup(()=>{observer.disconnect();activeRequest?.abort();receiptContext=null;chatMessageCaches.clear();document.querySelectorAll(`.${MESSAGE_BUTTON}`).forEach(button=>button.remove())});
   on(root.querySelector('[data-act=close]'),'click',closePanel);
   on(root.querySelector('[data-act=help]'),'click',()=>{
     if(panelView==='help') renderReceiptOrIdle();

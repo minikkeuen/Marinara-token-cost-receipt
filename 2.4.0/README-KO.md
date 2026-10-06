@@ -1,5 +1,21 @@
 # Token Cost Receipt for Marinara Engine 2.4.1
 
+## v3.0.9 변경 사항
+
+- `GPT 6.0` 표시명을 실제 대상인 `GPT-6 Astra`로 명확히 했습니다. GLM-4.5/4.6/4.7 및 4.7 FlashX, Kimi K2.7 Code/Code HighSpeed 프리셋을 목록에서 제거했습니다. 기존 사용자 저장 프로필은 유지합니다.
+- 확장 버전을 3.0.9로 올렸습니다. 기존 Gemini cache read·thinking 비용 교정과 나머지 기능은 그대로 유지합니다.
+
+## v3.0.8 변경 사항
+
+- 저장된 생성 provider가 `google`인 Gemini 직접 API 메시지는 completion과 thinking 토큰을 합산하여 기존 output 단가로 계산합니다. 화면 조회에서는 클릭 시 기존 metadata 캐시의 저장 usage를 보완 사용하며, provider 또는 reasoning을 확인하지 못하면 추정하지 않습니다. OpenRouter·호환 API에는 합산 규칙을 적용하지 않습니다.
+- Gemini·GLM 공식 API의 input에 포함된 cache read를 차감하도록 프리셋을 교정했습니다. 기존 저장 프로필은 커스텀 설정과 구분할 수 없어 유지합니다. 공식 API 사용 시 해당 모델 프리셋의 `값 불러오기` → `저장·재계산`을 누르거나, 차감 방식만 `cache read를 input에서 차감`으로 변경해 저장하세요.
+- 2026-10-06 공식 가격 기준으로 프리셋 가격·현행 모델·동일 가격 통합을 정리했습니다. 상세 근거와 계산 범위는 [PRICING-SOURCES.md](PRICING-SOURCES.md)를 참고하세요.
+- `/messages` metadata는 영수증 클릭 시 필요한 경우에만 조회합니다. DOM 변경으로 네트워크 요청을 보내지 않습니다.
+- 채팅별 15초 캐시와 진행 중 요청 공유를 적용하며, 누락·실패 시 즉시 강제 재조회하지 않습니다.
+- 클릭으로 확보한 metadata는 현재 DOM의 RP 메시지 날짜·시간 보강에도 사용합니다. 클릭 전에는 기존 시간 표시를 유지합니다.
+- DeepSeek 작성 시각을 확인할 수 없으면 조회 시점의 현재 요금으로 계산하고, 현재 요금 기준 추정값임을 영수증에 표시합니다. 채팅 전환·패널 닫기·다른 메시지 클릭 후 도착한 응답은 표시하지 않습니다.
+- RP 토큰은 화면에서 읽지만 작성 시각 조회에는 데이터가 사용됩니다. Peek Prompt 사용 여부는 기존 설정을 따릅니다.
+
 ## v3.0.6 변경 사항
 
 - 모델 단가 프리셋에 GPT 6.0, Gemini 3.8 Flash, DeepSeek 4.1 Flash, GLM-5.3을 추가했습니다.
