@@ -1,5 +1,9 @@
 # Token Cost Receipt for Marinara Engine 2.4.1
 
+## v3.0.10 변경 사항
+
+- Gemini 4 Argon 프리셋을 추가했습니다. 2026-11-30까지 소개가 2 / 0.1 / 0 / 10, 2026-12-01부터 4 / 0.2 / 0 / 20 (1M 토큰당 USD, 출력에 추론 포함, cache read를 input에서 차감).
+
 ## v3.0.9 변경 사항
 
 - `GPT 6.0` 표시명을 실제 대상인 `GPT-6 Astra`로 명확히 했습니다. GLM-4.5/4.6/4.7 및 4.7 FlashX, Kimi K2.7 Code/Code HighSpeed 프리셋을 목록에서 제거했습니다. 기존 사용자 저장 프로필은 유지합니다.

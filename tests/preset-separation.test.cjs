@@ -7,7 +7,7 @@ const entry = fs.readFileSync(path.join(packageDir, 'extension.js'), 'utf8');
 const presets = fs.readFileSync(path.join(packageDir, 'presets.js'), 'utf8');
 const manifest = JSON.parse(fs.readFileSync(path.join(packageDir, 'manifest.json'), 'utf8'));
 assert.deepEqual(manifest.config.jsPath, ['presets.js','extension.js']);
-assert.equal(manifest.config.version, '3.0.9');
+assert.equal(manifest.config.version, '3.0.10');
 const names = presets.match(/  return \{ (.+) \};/)[1];
 const definitions = presets.slice(presets.indexOf('{\n')+2, presets.lastIndexOf('  return {'));
 const baseline = entry.replace('  const { '+names+' } = createTokenCostReceiptPresetDefinitions();\n', definitions);

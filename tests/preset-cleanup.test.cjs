@@ -7,7 +7,7 @@ const removed=['glm-4.7','glm-4.7-flashx','kimi-k2.7-code','kimi-k2.7-code-highs
 const modelsRemoved=['glm-4.5','glm-4.6','glm-4.7','glm-4.7-flashx','kimi-k2.7-code','kimi-k2.7-code-highspeed'];
 (async()=>{
   const t=harness();
-  assert.equal(t.h.PRESETS.length,32);
+  assert.equal(t.h.PRESETS.length,34);
   for(const id of removed)assert.ok(!t.h.PRESETS.some(p=>p.id===id));
   for(const model of modelsRemoved)for(const suffix of ['', '-2026-10-01']){
     assert.equal(t.h.currentPreset({model:model+suffix}),null);
@@ -44,5 +44,5 @@ const modelsRemoved=['glm-4.5','glm-4.6','glm-4.7','glm-4.7-flashx','kimi-k2.7-c
       assert.equal(JSON.stringify(t.h.compute(g,t.h.currentPreset(g))),JSON.stringify(old.h.compute(g,old.h.currentPreset(g))));
     }
   }
-  console.log('PASS: 32 presets; only four removed rows and Astra label changed; exact model IDs/grouped aliases preserved; runtime/fallback/prices unchanged; removed-model user profiles retained.');
+  console.log('PASS: 34 presets; only four removed rows and Astra label changed; exact model IDs/grouped aliases preserved; runtime/fallback/prices unchanged; removed-model user profiles retained.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

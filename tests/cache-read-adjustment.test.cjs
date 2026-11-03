@@ -9,7 +9,7 @@ const near = (actual, expected) => assert.ok(Math.abs(actual-expected)<1e-12, `$
 (async()=>{
   const definitions=harness().h.PRESETS;
   const targets=definitions.filter(p=>/^(gemini-|glm-)/.test(p.id));
-  assert.equal(targets.length,10);
+  assert.equal(targets.length,12);
   const freshFx={rate:1300,updatedAt:Date.parse('2026-10-06T01:00:00Z')};
   let checks=0;
   for(const preset of targets){

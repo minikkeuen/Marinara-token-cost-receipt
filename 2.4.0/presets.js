@@ -27,6 +27,9 @@ function createTokenCostReceiptPresetDefinitions(){
     ]},
     // Official calendar dates; date-only values use JavaScript's existing UTC parsing.
     { label:'Google Gemini', items:[
+      // Gemini 4 Argon introductory rate through 2026-11-30, standard rate from 2026-12-01 (output includes thinking).
+      {id:'gemini-4-argon',label:'Gemini 4 Argon (소개가: 2026-11-30까지)',input:2,read:.1,write:0,output:10,adjustment:'subtract-read',activeUntil:'2026-12-01',currency:'USD'},
+      {id:'gemini-4-argon-standard',modelId:'gemini-4-argon',label:'Gemini 4 Argon (2026-12-01부터)',input:4,read:.2,write:0,output:20,adjustment:'subtract-read',activeFrom:'2026-12-01',currency:'USD'},
       {id:'gemini-3.8-flash',modelIds:['gemini-3.8-flash','gemini-3.7-flash','gemini-3.6-flash'],label:'Gemini 3.6 / 3.7 / 3.8 Flash (2026-12-31까지)',input:.75,read:.075,write:0,output:3.75,adjustment:'subtract-read',activeUntil:'2027-01-01',currency:'USD'},
       {id:'gemini-3.8-flash-standard',modelIds:['gemini-3.8-flash','gemini-3.7-flash','gemini-3.6-flash'],label:'Gemini 3.6 / 3.7 / 3.8 Flash (2027-01-01부터)',input:1.5,read:.15,write:0,output:7.5,adjustment:'subtract-read',activeFrom:'2027-01-01',currency:'USD'},
       {id:'gemini-3.5-flash',label:'Gemini 3.5 Flash',input:1.5,read:.15,write:0,output:9,adjustment:'subtract-read',currency:'USD'},
