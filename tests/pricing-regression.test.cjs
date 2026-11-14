@@ -5,7 +5,8 @@ const path=require('node:path');
 const dir=path.join(__dirname,'..');
 const presets=fs.readFileSync(path.join(dir,'presets.js'),'utf8');
 const extension=fs.readFileSync(path.join(dir,'extension.js'),'utf8');
-const sandbox=vm.createContext({Date});
+class FixedDate extends Date { static now(){return Date.parse('2026-11-14T00:00:00Z')} }
+const sandbox=vm.createContext({Date:FixedDate});
 vm.runInContext(presets+'\nthis.def=createTokenCostReceiptPresetDefinitions()',sandbox);
 const slice=(start,end)=>{const a=extension.indexOf('  function '+start+'('),b=extension.indexOf((end==='saveProfile'?'  async function ':'  function ')+end+'(',a);assert.ok(a>=0&&b>a);return extension.slice(a,b)};
 const functions=slice('deepSeekModelId','saveProfile').replace('  async function saveProfile','  function saveProfile');
