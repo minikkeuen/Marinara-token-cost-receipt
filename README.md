@@ -1,17 +1,20 @@
-# token-cost-receipt
-Extension for displaying token usage and API cost receipts in Marinara Engine.
+# Marinara Token Cost Receipt
 
-Downloads:
-- GitHub Releases
+Marinara Engine personal extension showing per-message token usage and estimated text API cost. Latest version: **v3.1.0**.
 
-## 사용 예시
-![메시지 아이콘](Images/receipt-icon-3.png)
+## Installation
 
-![메시지별 영수증](Images/receipt-example.png)
+Install the personal extension package containing `manifest.json`, `presets.js`, and `extension.js`. The `manifest.json` preserves the required script load order.
 
-## 설정 화면
-![모델 단가 설정](Images/cost-setting.png)
+## Documentation
 
-![모델 프리셋](Images/cost-setting-preset.png)
+- [Korean setup guide](README-KO.md)
+- [Pricing sources and billing limitations](PRICING-SOURCES.md)
 
-![설정 화면](Images/lookup-setting.png)
+Old version folders have been removed from the current tree; their contents are retained in Git history.
+
+## Screenshots
+
+![Receipt](Images/receipt-example.png)
+
+![Presets](Images/cost-setting-preset.png)

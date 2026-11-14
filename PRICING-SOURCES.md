@@ -45,3 +45,15 @@
 - Gemini/GLM의 `write:0`은 저장 시간 요금을 토큰당 write로 변환하지 않는다는 뜻입니다. 두 공급자의 공식 usage는 input에 cache read를 포함하므로 프리셋을 `adjustment:'subtract-read'`로 교정했습니다. 기존 저장 프로필에는 프리셋 출처·사용자 수정 여부가 없어 자동 변경하지 않습니다. 공식 API 사용 시 프리셋을 다시 불러와 저장하거나 차감 방식만 변경해 저장해야 합니다. [GLM usage·청구 예시](https://docs.z.ai/guides/capabilities/cache).
 - Google Gemini 직접 API의 `candidatesTokenCount`와 `thoughtsTokenCount`는 별도 값이며, 둘 모두 기존 output 단가로 과금됩니다. 저장된 `generationInfo.provider === 'google'`로 직접 API를 확인한 경우에만 `tokensCompletion + tokensReasoning`을 적용합니다. 모델명 추정, OpenRouter, OpenAI-compatible 및 `google_vertex` 경로에는 이번 합산 규칙을 적용하지 않습니다. 화면 경로는 클릭 시 기존 `/messages` 캐시의 저장 usage를 보완 사용하고, provider·model·prompt·completion·cache read가 일치하는 유효한 reasoning만 반영합니다. 가격과 기존 장문·기간 규칙은 유지합니다. [공식 usage](https://ai.google.dev/api/generate-content.md#UsageMetadata), [공식 가격표](https://ai.google.dev/gemini-api/docs/pricing).
 - 사용자가 승인한 기존 장문 분기 교정: GPT-6.1 Sol에도 >272K 분기를 적용하고, GPT-5.6의 write 배율을 1에서 2로 교정했습니다. 산술식·fallback·저장소·metadata 조회 방식은 유지했습니다. [OpenAI 가격표](https://developers.openai.com/api/docs/pricing).
+
+
+## 2026-11-14 pricing update (v3.1.0)
+
+USD per one million text tokens. These presets use the provider's direct Standard API tier and are estimates only.
+
+- OpenAI GPT-6.1 Terra: input $1, cached read $0.05, cache write $1.25, output $5; prompt beyond 272K multiplies input/cache rates 2x and output 1.5x. https://developers.openai.com/api/docs/pricing
+- Anthropic Fable/Mythos 5.2: input $8, cache read $0.20, 5m write $10, 1h write $16, output $40. Haiku 5.5: input $0.10, cache read $0.01, 5m write $0.125, 1h write $0.20, output $0.50, with 5x for prompt longer than 100K. https://platform.claude.com/docs/en/about-claude/pricing
+- Google Carbon/Argon: before 2026-12-01 input $2, cached read $0.10, output $10; from 2026-12-01 input $4, read $0.20, output $20. Hydrogen: input $1.50, read $0.075, output $7.50. https://ai.google.dev/gemini-api/docs/pricing
+- Kimi K3.1 Pro: input $2, cache read $0.20, 5m write $2, 1h write $4, output $10; Highspeed input $4, read $0.20, write $4/$8, output $20. K2.7 Code input $0.95, read $0.19, output $4; Highspeed input $1.90, read $0.38, output $8. https://platform.moonshot.ai/
+
+Exclude Batch/Flex/Vertex billing, cache storage, audio/image tariffs, and account-specific discounts. Saved custom model profiles are retained.

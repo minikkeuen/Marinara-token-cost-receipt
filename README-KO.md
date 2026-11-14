@@ -58,3 +58,11 @@
 - 대화모드 Peek Prompt: 켬
 
 각 메시지의 영수증 팝오버에서 `?` 버튼을 누르면 사용법을 다시 볼 수 있고, 톱니바퀴 버튼을 누르면 위 설정을 변경할 수 있습니다.
+
+
+## v3.1.0 (2026-11-14)
+
+- 주요 신규 모델 프리셋 추가: GPT-6.1 Terra, Claude Fable/Mythos 5.2, Claude Haiku 5.5, Gemini 4 Carbon/Argon/Hydrogen, Kimi K3.1 Pro 및 K2.7 Code 계열.
+- Gemini 4 Carbon/Argon의 2026-12-01 전환 요금과 OpenAI/Anthropic 장문 프롬프트 분기 반영.
+- 기존에 저장된 사용자별 단가는 자동 변경되지 않으며 사용자 선택 후 새 프리셋을 적용할 수 있습니다.
+- 저장소의 구형 버전 디렉터리를 제거하고 최신 코드를 루트에서 관리합니다.

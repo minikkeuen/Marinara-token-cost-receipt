@@ -124,7 +124,7 @@ function dateAlreadyKnown(m,id){
         assert.equal(JSON.stringify(t.h.compute(g,preset)),JSON.stringify(old.h.compute(g,preset)));
       }
     }
-    assert.equal(fs.readFileSync(path.join(process.argv[2],'presets.js'),'utf8'),fs.readFileSync(path.join(__dirname,'../2.4.0/presets.js'),'utf8'));
+    assert.equal(fs.readFileSync(path.join(process.argv[2],'presets.js'),'utf8'),fs.readFileSync(path.join(__dirname,'../presets.js'),'utf8'));
   }
   console.log('PASS: native Google thinking via screen/messages and peek; zero thinking; cache/write invariance; long-context tiers; explicit provenance; proxy exclusion; no guessed reasoning; lazy TTL/dedup/stale responses; unchanged other providers and presets.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

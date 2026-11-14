@@ -79,7 +79,7 @@ const near = (actual, expected) => assert.ok(Math.abs(actual-expected)<1e-12, `$
       if(/^(gemini-|glm-)/.test(expected.id))expected.adjustment='subtract-read';
       assert.deepEqual(copy(definitions[i]),expected);
     }
-    const entry=fs.readFileSync(path.join(__dirname,'../2.4.0/extension.js'),'utf8');
+    const entry=fs.readFileSync(path.join(__dirname,'../extension.js'),'utf8');
     const withoutHelp=text=>text.replace(/  function renderHelp\(\)\{[\s\S]*?\n  function renderSettings/, '  function renderSettings');
     assert.equal(withoutHelp(entry),withoutHelp(beforeEntry),'runtime changes are limited to help text');
   }

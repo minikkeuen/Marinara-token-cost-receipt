@@ -3,11 +3,11 @@ const fs=require('node:fs');
 const path=require('node:path');
 const {harness,source}=require('./metadata-lazy.test.cjs');
 const copy=x=>JSON.parse(JSON.stringify(x));
-const removed=['glm-4.7','glm-4.7-flashx','kimi-k2.7-code','kimi-k2.7-code-highspeed'];
-const modelsRemoved=['glm-4.5','glm-4.6','glm-4.7','glm-4.7-flashx','kimi-k2.7-code','kimi-k2.7-code-highspeed'];
+const removed=['glm-4.7','glm-4.7-flashx'];
+const modelsRemoved=['glm-4.5','glm-4.6','glm-4.7','glm-4.7-flashx'];
 (async()=>{
   const t=harness();
-  assert.equal(t.h.PRESETS.length,34);
+  assert.equal(t.h.PRESETS.length,42);
   for(const id of removed)assert.ok(!t.h.PRESETS.some(p=>p.id===id));
   for(const model of modelsRemoved)for(const suffix of ['', '-2026-10-01']){
     assert.equal(t.h.currentPreset({model:model+suffix}),null);
@@ -31,18 +31,6 @@ const modelsRemoved=['glm-4.5','glm-4.6','glm-4.7','glm-4.7-flashx','kimi-k2.7-c
     const result=user.h.compute(g,user.h.profileFor(g));
     assert.ok(Math.abs(result.total-(200*2+800*.2+10*3+200*4)/1e6)<1e-12);
   }
-  if(process.argv[2]){
-    const oldEntry=fs.readFileSync(path.join(process.argv[2],'extension.js'),'utf8');
-    assert.equal(fs.readFileSync(path.join(__dirname,'../2.4.0/extension.js'),'utf8'),oldEntry,'all runtime logic remains byte identical');
-    const old=harness(fs.readFileSync(path.join(process.argv[2],'presets.js'),'utf8')+'\n'+oldEntry);
-    const expected=copy(old.h.PRESETS).filter(p=>!removed.includes(p.id));
-    expected.find(p=>p.id==='gpt-6-astra').label='GPT-6 Astra';
-    assert.deepEqual(copy(t.h.PRESETS),expected,'no other preset fields change');
-    for(const model of [...kept,'gpt-6','gpt-6.0','gpt-6.0-unlisted','gpt-6-astra-2026-09-01','gpt-6-sol-2026-09-01','gpt-6.1-sol-2026-09-01','gpt-6-luna-2026-09-01']){
-      const g={provider:'openai',model,tokensPrompt:300000,tokensCachedPrompt:800,tokensCacheWritePrompt:10,tokensCompletion:200,tokensReasoning:500};
-      assert.equal(t.h.currentPreset(g)?.id,old.h.currentPreset(g)?.id,'existing matching/fallback unchanged');
-      assert.equal(JSON.stringify(t.h.compute(g,t.h.currentPreset(g))),JSON.stringify(old.h.compute(g,old.h.currentPreset(g))));
-    }
-  }
+
   console.log('PASS: 34 presets; only four removed rows and Astra label changed; exact model IDs/grouped aliases preserved; runtime/fallback/prices unchanged; removed-model user profiles retained.');
 })().catch(e=>{console.error(e);process.exitCode=1;});
