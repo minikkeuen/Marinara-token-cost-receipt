@@ -11,7 +11,7 @@
 ## Work and verification
 
 - Prefer small root-cause fixes and targeted code-based regression proofs. Do not repeat expensive or unrelated checks.
-- Do not start a server/browser, use real paid providers, or interact with personal accounts without explicit authorization.
+- Do not start a server/browser, use real paid providers, or interact with personal accounts without explicit maintainer authorization.
 - Never commit tokens, API keys, private usage records or generated personal receipts.
 - Separate static inspection, mocked/unit tests, live Engine checks and real billing verification in reports.
-- Documentation-only PRs do not require runtime code or version changes. Do not merge, publish or release without user approval.
+- Documentation-only PRs do not require runtime code or version changes. Do not merge, publish or release without explicit maintainer authorization.
