@@ -9,7 +9,7 @@ const near = (actual, expected) => assert.ok(Math.abs(actual-expected)<1e-12, `$
 (async()=>{
   const definitions=harness().h.PRESETS;
   const targets=definitions.filter(p=>/^(gemini-|glm-)/.test(p.id));
-  assert.equal(targets.length,12);
+  assert.equal(targets.length,13);
   const freshFx={rate:1300,updatedAt:Date.parse('2026-10-06T01:00:00Z')};
   let checks=0;
   for(const preset of targets){
@@ -79,9 +79,9 @@ const near = (actual, expected) => assert.ok(Math.abs(actual-expected)<1e-12, `$
       if(/^(gemini-|glm-)/.test(expected.id))expected.adjustment='subtract-read';
       assert.deepEqual(copy(definitions[i]),expected);
     }
-    const entry=fs.readFileSync(path.join(__dirname,'../2.4.0/extension.js'),'utf8');
+    const entry=fs.readFileSync(path.join(__dirname,'../extension.js'),'utf8');
     const withoutHelp=text=>text.replace(/  function renderHelp\(\)\{[\s\S]*?\n  function renderSettings/, '  function renderSettings');
     assert.equal(withoutHelp(entry),withoutHelp(beforeEntry),'runtime changes are limited to help text');
   }
-  console.log(`PASS: 10 corrected presets; ${checks} cache cost checks; legacy/custom profiles preserved; actual load/save repairs; unrelated profiles unchanged.`);
+  console.log(`PASS: 13 Google/GLM presets; ${checks} cache cost checks; legacy/custom profiles preserved; actual load/save repairs; unrelated profiles unchanged.`);
 })().catch(error=>{console.error(error);process.exitCode=1;});

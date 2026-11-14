@@ -340,9 +340,12 @@
     if(provider==='google'&&/^gemini-3\.1-pro(?:-preview)?(?:-|$)/.test(model)&&raw>200000){
       return {threshold:200000,input:2,read:2,write:1,output:1.5};
     }
-    const gpt6=/^(?:gpt-6(?:\.0)?(?:-astra)?|gpt-6\.1-sol)(?:-|$)/.test(model);
+    const gpt6=/^(?:gpt-6(?:\.0)?(?:-astra)?|gpt-6\.1-(?:sol|terra))(?:-|$)/.test(model);
     if(provider==='openai'&&gpt6&&raw>272000){
       return {threshold:272000,input:2,read:2,write:2,output:1.5};
+    }
+    if(provider==='anthropic'&&/^claude-haiku-5-5(?:-|$)/.test(model)&&raw>100000){
+      return {threshold:100000,input:5,read:5,write:5,output:5};
     }
     const gpt54=/^gpt-5\.4(?:-\d|$)/.test(model);
     const gpt55=/^gpt-5\.5(?:-\d|$)/.test(model);

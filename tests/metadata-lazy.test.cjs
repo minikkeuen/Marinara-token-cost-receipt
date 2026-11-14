@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const path = require('node:path');
-const packageDir = path.join(__dirname, '../2.4.0');
+const packageDir = path.join(__dirname, '..');
 const manifest = JSON.parse(fs.readFileSync(path.join(packageDir, 'manifest.json'), 'utf8'));
 const source = [].concat(manifest.config.jsPath).map(file => fs.readFileSync(path.join(packageDir, file), 'utf8')).join('\n\n');
 class Element {

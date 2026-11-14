@@ -1,9 +1,10 @@
 function createTokenCostReceiptPresetDefinitions(){
-  // Standard text-token rates per 1M tokens, verified 2026-10-06.
+  // Standard text-token rates per 1M tokens, verified 2026-11-14.
   // Sources and unsupported charges: PRICING-SOURCES.md.
   const PRESET_GROUPS = [
     { label:'OpenAI', items:[
       {id:'gpt-6-astra',modelId:'gpt-6-astra',label:'GPT-6 Astra',input:10,read:1,write:12.5,output:50,adjustment:'subtract-both',currency:'USD'},
+      {id:'gpt-6.1-terra',label:'GPT-6.1 Terra',input:1,read:.05,write:1.25,output:5,adjustment:'subtract-both',currency:'USD'},
       {id:'gpt-6.1-sol',label:'GPT-6.1 Sol',input:2,read:.1,write:2.5,output:10,adjustment:'subtract-both',currency:'USD'},
       {id:'gpt-6-sol',modelId:'gpt-6-sol',label:'GPT-6 Sol',input:2,read:.2,write:2.5,output:10,adjustment:'subtract-both',currency:'USD'},
       {id:'gpt-6-luna',label:'GPT-6 Luna',input:.1,read:.01,write:.125,output:.5,adjustment:'subtract-both',currency:'USD'},
@@ -17,19 +18,22 @@ function createTokenCostReceiptPresetDefinitions(){
       {id:'gpt-5.4-nano',label:'GPT-5.4 nano',input:.2,read:.02,write:0,output:1.25,adjustment:'subtract-read',currency:'USD'},
     ]},
     { label:'Anthropic', items:[
+      {id:'claude-fable-5-2',modelIds:['claude-fable-5-2','claude-mythos-5-2'],label:'Claude Fable / Mythos 5.2',input:8,read:.2,write:10,write1h:16,output:40,adjustment:'none',currency:'USD'},
       {id:'claude-fable-5-1',modelIds:['claude-fable-5-1','claude-mythos-5-1'],label:'Claude Fable / Mythos 5.1',input:10,read:.25,write:12.5,write1h:20,output:50,adjustment:'none',currency:'USD'},
       {id:'claude-fable-5',modelIds:['claude-fable-5','claude-mythos-5'],label:'Claude Fable / Mythos 5',input:10,read:1,write:12.5,write1h:20,output:50,adjustment:'none',currency:'USD'},
       {id:'claude-opus-5-5',modelId:'claude-opus-5-5',label:'Claude Opus 5.5',input:4,read:.2,write:5,write1h:8,output:20,adjustment:'none',currency:'USD'},
       {id:'claude-opus-5',modelIds:['claude-opus-5','claude-opus-4-8','claude-opus-4-7','claude-opus-4-6','claude-opus-4-5'],label:'Claude Opus 5 / 4.5–4.8',input:5,read:.5,write:6.25,write1h:10,output:25,adjustment:'none',currency:'USD'},
       {id:'claude-sonnet-5',modelIds:['claude-sonnet-5','claude-sonnet-5-5'],label:'Claude Sonnet 5 / 5.5',input:2,read:.2,write:2.5,write1h:4,output:10,adjustment:'none',currency:'USD'},
       {id:'claude-sonnet-4-6',modelIds:['claude-sonnet-4-6','claude-sonnet-4-5'],label:'Claude Sonnet 4.5 / 4.6',input:3,read:.3,write:3.75,write1h:6,output:15,adjustment:'none',currency:'USD'},
+      {id:'claude-haiku-5-5',label:'Claude Haiku 5.5',input:.1,read:.01,write:.125,write1h:.2,output:.5,adjustment:'none',currency:'USD'},
       {id:'claude-haiku-4-5',label:'Claude Haiku 4.5',input:1,read:.1,write:1.25,write1h:2,output:5,adjustment:'none',currency:'USD'},
     ]},
     // Official calendar dates; date-only values use JavaScript's existing UTC parsing.
     { label:'Google Gemini', items:[
       // Gemini 4 Argon introductory rate through 2026-11-30, standard rate from 2026-12-01 (output includes thinking).
-      {id:'gemini-4-argon',label:'Gemini 4 Argon (소개가: 2026-11-30까지)',input:2,read:.1,write:0,output:10,adjustment:'subtract-read',activeUntil:'2026-12-01',currency:'USD'},
-      {id:'gemini-4-argon-standard',modelId:'gemini-4-argon',label:'Gemini 4 Argon (2026-12-01부터)',input:4,read:.2,write:0,output:20,adjustment:'subtract-read',activeFrom:'2026-12-01',currency:'USD'},
+      {id:'gemini-4-carbon-argon',modelIds:['gemini-4-carbon','gemini-4-argon'],label:'Gemini 4 Carbon / Argon (2026-11-30까지)',input:2,read:.1,write:0,output:10,adjustment:'subtract-read',activeUntil:'2026-12-01',currency:'USD'},
+      {id:'gemini-4-carbon-argon-standard',modelIds:['gemini-4-carbon','gemini-4-argon'],label:'Gemini 4 Carbon / Argon (2026-12-01부터)',input:4,read:.2,write:0,output:20,adjustment:'subtract-read',activeFrom:'2026-12-01',currency:'USD'},
+      {id:'gemini-4-hydrogen',label:'Gemini 4 Hydrogen',input:1.5,read:.075,write:0,output:7.5,adjustment:'subtract-read',currency:'USD'},
       {id:'gemini-3.8-flash',modelIds:['gemini-3.8-flash','gemini-3.7-flash','gemini-3.6-flash'],label:'Gemini 3.6 / 3.7 / 3.8 Flash (2026-12-31까지)',input:.75,read:.075,write:0,output:3.75,adjustment:'subtract-read',activeUntil:'2027-01-01',currency:'USD'},
       {id:'gemini-3.8-flash-standard',modelIds:['gemini-3.8-flash','gemini-3.7-flash','gemini-3.6-flash'],label:'Gemini 3.6 / 3.7 / 3.8 Flash (2027-01-01부터)',input:1.5,read:.15,write:0,output:7.5,adjustment:'subtract-read',activeFrom:'2027-01-01',currency:'USD'},
       {id:'gemini-3.5-flash',label:'Gemini 3.5 Flash',input:1.5,read:.15,write:0,output:9,adjustment:'subtract-read',currency:'USD'},
@@ -48,6 +52,10 @@ function createTokenCostReceiptPresetDefinitions(){
       {id:'glm-5',label:'GLM-5',input:1,read:.2,write:0,output:3.2,adjustment:'subtract-read',currency:'USD'},
     ]},
     { label:'Kimi', items:[
+      {id:'kimi-k3.1-pro',label:'Kimi K3.1 Pro',input:2,read:.2,write:2,write1h:4,output:10,adjustment:'subtract-both',currency:'USD'},
+      {id:'kimi-k3.1-pro-highspeed',label:'Kimi K3.1 Pro Highspeed',input:4,read:.2,write:4,write1h:8,output:20,adjustment:'subtract-both',currency:'USD'},
+      {id:'kimi-k2.7-code',label:'Kimi K2.7 Code',input:.95,read:.19,write:0,output:4,adjustment:'subtract-read',currency:'USD'},
+      {id:'kimi-k2.7-code-highspeed',label:'Kimi K2.7 Code Highspeed',input:1.9,read:.38,write:0,output:8,adjustment:'subtract-read',currency:'USD'},
       {id:'kimi-k3',label:'Kimi K3',input:3,read:.3,write:3,write1h:6,output:15,adjustment:'subtract-both',currency:'USD'},
       {id:'kimi-k2.6',label:'Kimi K2.6',input:.95,read:.16,write:0,output:4,adjustment:'subtract-read',currency:'USD'},
     ]},

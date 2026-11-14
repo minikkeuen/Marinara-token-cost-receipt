@@ -5,18 +5,18 @@ const {harness,source}=require('./metadata-lazy.test.cjs');
 const t=harness();
 const unitFields=['input','read','write','output','write1h'];
 const prices={
-  'gpt-6-astra':[10,1,12.5,50], 'gpt-6.1-sol':[2,.1,2.5,10], 'gpt-6-sol':[2,.2,2.5,10], 'gpt-6-luna':[.1,.01,.125,.5],
+  'gpt-6-astra':[10,1,12.5,50], 'gpt-6.1-terra':[1,.05,1.25,5], 'gpt-6.1-sol':[2,.1,2.5,10], 'gpt-6-sol':[2,.2,2.5,10], 'gpt-6-luna':[.1,.01,.125,.5],
   'gpt-5.6-sol':[4,.4,5,20], 'gpt-5.6-terra':[2,.2,2.5,12], 'gpt-5.6-luna':[.2,.02,.25,1.2],
   'gpt-5.5':[5,.5,0,30], 'gpt-5.4':[2.5,.25,0,15], 'gpt-5.4-mini':[.75,.075,0,4.5], 'gpt-5.4-nano':[.2,.02,0,1.25],
-  'claude-fable-5-1':[10,.25,12.5,50,20], 'claude-fable-5':[10,1,12.5,50,20], 'claude-opus-5-5':[4,.2,5,20,8],
+  'claude-fable-5-2':[8,.2,10,40,16], 'claude-haiku-5-5':[.1,.01,.125,.5,.2], 'claude-fable-5-1':[10,.25,12.5,50,20], 'claude-fable-5':[10,1,12.5,50,20], 'claude-opus-5-5':[4,.2,5,20,8],
   'claude-opus-5':[5,.5,6.25,25,10], 'claude-sonnet-5':[2,.2,2.5,10,4], 'claude-sonnet-4-6':[3,.3,3.75,15,6], 'claude-haiku-4-5':[1,.1,1.25,5,2],
-  'gemini-4-argon':[2,.1,0,10], 'gemini-4-argon-standard':[4,.2,0,20],
+  'gemini-4-carbon-argon':[2,.1,0,10], 'gemini-4-carbon-argon-standard':[4,.2,0,20], 'gemini-4-hydrogen':[1.5,.075,0,7.5],
   'gemini-3.8-flash':[.75,.075,0,3.75], 'gemini-3.8-flash-standard':[1.5,.15,0,7.5], 'gemini-3.5-flash':[1.5,.15,0,9],
   'gemini-3.1-pro-preview':[2,.2,0,12], 'gemini-3.5-flash-lite':[.3,.03,0,2.5], 'gemini-3.1-flash-lite':[.25,.025,0,1.5],
   'deepseek-v4.1-flash':[.15,.003,0,.6], 'deepseek-v4-pro':[.66,.022,0,1.98],
   'glm-5.3':[1.4,.26,0,4.4], 'glm-5.3-flash':[.15,.03,0,.5], 'glm-5.3-flashx':[.37,.075,0,1.25],
   'glm-5':[1,.2,0,3.2],
-  'kimi-k3':[3,.3,3,15,6], 'kimi-k2.6':[.95,.16,0,4],
+  'kimi-k3.1-pro':[2,.2,2,10,4], 'kimi-k3.1-pro-highspeed':[4,.2,4,20,8], 'kimi-k2.7-code':[.95,.19,0,4], 'kimi-k2.7-code-highspeed':[1.9,.38,0,8], 'kimi-k3':[3,.3,3,15,6], 'kimi-k2.6':[.95,.16,0,4],
 };
 let matching=0,costs=0;
 function near(actual,expected) {assert.ok(Math.abs(actual-expected)<1e-10,`${actual} != ${expected}`);}
@@ -56,6 +56,12 @@ assert.equal(t.h.currentPreset({model:'gpt-5.4-pro'}),null);
 assert.equal(t.h.currentPreset({model:'gpt-5.5-pro'}),null);
 assert.equal(t.h.currentPreset({model:'gpt-6-luna-2026-07-01'})?.id,'gpt-6-luna');
 assert.equal(t.h.currentPreset({model:'gpt-6.1-sol-2026-09-10'})?.id,'gpt-6.1-sol');
+const haiku=t.h.currentPreset({model:'claude-haiku-5-5'});
+for(const raw of [100000,100001]){
+  const result=t.h.compute({model:'claude-haiku-5-5',provider:'anthropic',tokensPrompt:raw,tokensCachedPrompt:100,tokensCacheWritePrompt:200,tokensCompletion:300},haiku);
+  assert.equal(result.rates.input,raw>100000?.5:.1);
+  assert.equal(result.rates.output,raw>100000?2.5:.5);
+}
 const promo=t.h.PRESETS.find(p=>p.id==='gemini-3.8-flash'),standard=t.h.PRESETS.find(p=>p.id==='gemini-3.8-flash-standard');
 assert.equal(t.h.presetIsActive(promo,Date.parse('2026-12-31T23:59:59Z')),true);
 assert.equal(t.h.presetIsActive(promo,Date.parse('2027-01-01T00:00:00Z')),false);
@@ -65,7 +71,7 @@ for(const model of ['gemini-3.6-flash','gemini-3.7-flash','gemini-3.8-flash'])as
 assert.equal(t.h.PRESETS.find(p=>p.id==='gpt-5.6-sol').promotionGuaranteedThrough,'2026-11-21');
 assert.equal(t.h.PRESETS.find(p=>p.id==='gpt-5.6-sol').activeUntil,undefined,'no guessed promotion end');
 // Approved corrections: retain the same threshold and multipliers; include 6.1 and double 5.6 writes.
-for(const model of ['gpt-6.1-sol','gpt-6-sol','gpt-6-astra','gpt-6-luna','gpt-5.6-sol','gpt-5.6-terra','gpt-5.6-luna']) {
+for(const model of ['gpt-6.1-terra','gpt-6.1-sol','gpt-6-sol','gpt-6-astra','gpt-6-luna','gpt-5.6-sol','gpt-5.6-terra','gpt-5.6-luna']) {
   const p=t.h.currentPreset({model});const short=t.h.compute({model,provider:'openai',tokensPrompt:272000,tokensCachedPrompt:100,tokensCacheWritePrompt:200,tokensCompletion:300},p);
   const long=t.h.compute({model,provider:'openai',tokensPrompt:272001,tokensCachedPrompt:100,tokensCacheWritePrompt:200,tokensCompletion:300},p);
   assert.equal(short.tier,null);assert.equal(long.tier.threshold,272000);
