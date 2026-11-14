@@ -32,5 +32,5 @@ const modelsRemoved=['glm-4.5','glm-4.6','glm-4.7','glm-4.7-flashx'];
     assert.ok(Math.abs(result.total-(200*2+800*.2+10*3+200*4)/1e6)<1e-12);
   }
 
-  console.log('PASS: 34 presets; only four removed rows and Astra label changed; exact model IDs/grouped aliases preserved; runtime/fallback/prices unchanged; removed-model user profiles retained.');
+  console.log('PASS: 42 presets; legacy GLM models excluded; current model IDs/grouped aliases preserved; removed-model saved profiles retained.');
 })().catch(e=>{console.error(e);process.exitCode=1;});
