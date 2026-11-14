@@ -7,7 +7,7 @@ const presets=fs.readFileSync(path.join(dir,'presets.js'),'utf8');
 const extension=fs.readFileSync(path.join(dir,'extension.js'),'utf8');
 const sandbox=vm.createContext({Date});
 vm.runInContext(presets+'\nthis.def=createTokenCostReceiptPresetDefinitions()',sandbox);
-const slice=(start,end)=>{const a=extension.indexOf('  function '+start+'('),b=extension.indexOf('  function '+end+'(',a);assert.ok(a>=0&&b>a);return extension.slice(a,b)};
+const slice=(start,end)=>{const a=extension.indexOf('  function '+start+'('),b=extension.indexOf((end==='saveProfile'?'  async function ':'  function ')+end+'(',a);assert.ok(a>=0&&b>a);return extension.slice(a,b)};
 const functions=slice('deepSeekModelId','saveProfile').replace('  async function saveProfile','  function saveProfile');
 const profile=slice('profileFor','deepSeekModelId');
 vm.runInContext('const {PRESETS,DEEPSEEK_V4_RATES,DEEPSEEK_V4_LEGACY_RATES,DEEPSEEK_V4_TIER_START,DEEPSEEK_WEEKEND_RULE_START,DEEPSEEK_V41_FLASH_START}=def;\nconst cfg={profiles:{"openai::gpt-6.1-terra":{input:7,output:9}}};\nconst num=v=>Number.isFinite(Number(v))?Number(v):0;\nconst hasReasoningCount=g=>Number.isFinite(Number(g.tokensReasoning));\n'+profile+functions+'\nthis.h={currentPreset,presetIsActive,compute,deepSeekPricingAt,profileFor}',sandbox);
